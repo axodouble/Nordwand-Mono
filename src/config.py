@@ -12,8 +12,7 @@ class FontConfig:
     units_per_em: int = 1000
     window_ascent: int = 1025
     window_descent: int = -300
-    # window_width: int = 600
-    window_width: int = 589
+    window_width: int = 600
 
     ascent: int = 750
     descent: int = -185
@@ -29,7 +28,7 @@ class FontConfig:
     parenthesis_length: int = 1060
 
     min_margin_lowercase: int = 26
-    min_margin_uppercase: int = 32.5
+    min_margin_uppercase: int = 38
 
     italic_angle: float = 9.4
 
