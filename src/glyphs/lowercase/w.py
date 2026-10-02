@@ -10,10 +10,10 @@ class LowercaseWGlyph(Glyph):
     unicode = "0x77"
     offset = 0
     overlap = 1
-    outer_branch_ratio = 0.25
+    outer_branch_ratio = 0.265
     inner_height = 1
     width_ratio = 1.27
-    stroke_ratio = 1.1
+    stroke_ratio = 1.12
     lower_section_height = 1.2
 
     def draw(self, pen, dc):

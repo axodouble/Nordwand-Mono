@@ -141,7 +141,12 @@ def overlay_reference(ax, font_path, char, show_controls, rescale=False):
 
     path = recording_to_mpl_path(out)
     patch = mpatches.PathPatch(
-        path, facecolor="none", edgecolor="#111", linewidth=1.5, linestyle="--", alpha=0.9
+        path,
+        facecolor="none",
+        edgecolor="#111",
+        linewidth=1.5,
+        linestyle="--",
+        alpha=0.9,
     )
     ax.add_patch(patch)
     if show_controls:
@@ -149,11 +154,11 @@ def overlay_reference(ax, font_path, char, show_controls, rescale=False):
 
     scaled_adv = scale * ref_adv
     ax.axvline(scaled_adv, color="#111", linewidth=1.2, linestyle="--", alpha=0.7)
-    ax.text(scaled_adv, fc.window_descent, " ref adv", fontsize=7, color="#111", va="bottom")
-
-    basis = (
-        f"cell width={fc.window_width}" if rescale else f"x-height={fc.x_height}"
+    ax.text(
+        scaled_adv, fc.window_descent, " ref adv", fontsize=7, color="#111", va="bottom"
     )
+
+    basis = f"cell width={fc.window_width}" if rescale else f"x-height={fc.x_height}"
     lo, hi = _recording_x_bounds(out)
     print(
         f"Reference '{char}' from {font_path}: scale={scale:.3f}; "
@@ -369,7 +374,7 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
         glyph = None
         consumed = 1
         for seq in ligatures:
-            if text[i:i + len(seq)] == seq:
+            if text[i : i + len(seq)] == seq:
                 glyph = ligature_map[seq]
                 consumed = len(seq)
                 break
@@ -469,8 +474,12 @@ if __name__ == "__main__":
         nargs="?",
         help="Glyph slug name (e.g. lowercase_o). Ignored when -t is used.",
     )
-    parser.add_argument("-t", "--text", type=str, default=None, help="Render a text string")
-    parser.add_argument("-c", action="store_true", help="Show bezier control points (construction)")
+    parser.add_argument(
+        "-t", "--text", type=str, default=None, help="Render a text string"
+    )
+    parser.add_argument(
+        "-c", action="store_true", help="Show bezier control points (construction)"
+    )
     parser.add_argument("-o", action="store_true", help="Show optical center")
     parser.add_argument(
         "-s",
@@ -482,7 +491,9 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument("--pt", type=float, default=None, help="Point size (text mode)")
-    parser.add_argument("--guides", action="store_true", help="Show helper lines (text mode)")
+    parser.add_argument(
+        "--guides", action="store_true", help="Show helper lines (text mode)"
+    )
     parser.add_argument(
         "--config",
         metavar="FILE.yml",
@@ -534,8 +545,7 @@ if __name__ == "__main__":
         configs = [DrawConfig() if w == 400 else DrawConfig.weight(w=w)]
     else:
         configs = [
-            DrawConfig(stroke_x=int(s), stroke_y=int(s) - 10)
-            for s in args.s.split(",")
+            DrawConfig(stroke_x=int(s), stroke_y=int(s) - 10) for s in args.s.split(",")
         ]
 
     if args.text is not None:

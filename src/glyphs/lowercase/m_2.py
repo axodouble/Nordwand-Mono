@@ -18,6 +18,8 @@ class LowercaseM2Glyph(Glyph):
     min_taper_2 = 0.15
     ending_thickness = 0.75
     min_width = 74
+    stroke_x_ratio = 0.95
+    stroke_y_ratio = 1
 
     def draw(self, pen, dc):
         b = dc.body_bounds(
@@ -30,7 +32,8 @@ class LowercaseM2Glyph(Glyph):
         taper2 = max(self.min_taper_2, self.taper2 * dc.taper)
         mid_y = (1 - self.mid_len) * (b.height - b.y1)
         hx, hy = b.hx * self.hx_ratio, b.hy
-        sx = max(0, 0.9 * (dc.stroke_x - 90)) + min(90, dc.stroke_x)
+        sx, sy = dc.stroke_x * self.stroke_x_ratio, dc.stroke_y * self.stroke_y_ratio
+        sx = max(0, 0.8 * (sx - 90)) + min(90, sx)
 
         wo = (b.width - 3 * sx) / 2
         if wo < self.min_width:
@@ -46,7 +49,7 @@ class LowercaseM2Glyph(Glyph):
         draw_arch(
             pen,
             smid,
-            self.top_stroke_y * dc.stroke_y,
+            sy,
             b.x1 + (sx - smid),
             b.y1,
             b.xmid + mid_offset,
@@ -62,7 +65,7 @@ class LowercaseM2Glyph(Glyph):
         draw_arch(
             pen,
             sx,
-            self.top_stroke_y * dc.stroke_y,
+            sy,
             b.xmid - mid_offset - (sx - smid),
             b.y1,
             b.x2,
