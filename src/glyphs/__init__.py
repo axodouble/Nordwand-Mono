@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from config import FontConfig as fc
 
 
 class Glyph(ABC):
@@ -39,6 +38,89 @@ class Glyph(ABC):
         delta = exp(-ds * coef)
         sx = delta * stroke * ratio
         return sx
+
+
+class InfiniteLigatureGlyph(Glyph):
+    """Glyph whose horizontal bars can join across any number of cells."""
+
+    ligature_dent_stroke = 0.5
+    ligature_junction_width = 0.5
+
+    @abstractmethod
+    def horizontal_bar_heights(self, dc) -> tuple[float, ...]: ...
+
+    @abstractmethod
+    def horizontal_bar_stroke(self, dc) -> float: ...
+
+    @abstractmethod
+    def horizontal_bar_bounds(self, dc) -> tuple[float, float]: ...
+
+    def draw_non_horizontal(self, pen, dc) -> None:
+        pass
+
+    def draw(self, pen, dc) -> None:
+        self._draw_joined(pen, dc, join_left=False, join_right=False)
+
+    def _draw_joined(self, pen, dc, join_left, join_right) -> None:
+        from draw.rect import draw_rect
+
+        stroke = self.horizontal_bar_stroke(dc)
+        dent = stroke * self.ligature_dent_stroke
+        junction_width = stroke * self.ligature_junction_width
+        x1, x2 = self.horizontal_bar_bounds(dc)
+        if join_left:
+            x1 = junction_width / 2
+        if join_right:
+            x2 = dc.window_width - junction_width / 2
+
+        self.draw_non_horizontal(pen, dc)
+        for y in self.horizontal_bar_heights(dc):
+            draw_rect(pen, x1, y - stroke / 2, x2, y + stroke / 2)
+            if join_right:
+                draw_rect(
+                    pen,
+                    dc.window_width - junction_width / 2,
+                    y - dent / 2,
+                    dc.window_width + junction_width / 2,
+                    y + dent / 2,
+                )
+
+    def ligature_forms(self):
+        return [
+            InfiniteLigatureForm(self, "start", join_left=False, join_right=True),
+            InfiniteLigatureForm(self, "middle", join_left=True, join_right=True),
+            InfiniteLigatureForm(self, "end", join_left=True, join_right=False),
+        ]
+
+
+class InfiniteLigatureForm(Glyph):
+    """One contextual joining form of an :class:`InfiniteLigatureGlyph`."""
+
+    generated_only = True
+    name = None
+    unicode = None
+    offset = 0
+    number_characters = 1
+    font_feature = None
+    default_italic = False
+    italic_only = False
+    feature_tags = ("calt",)
+
+    def __init__(self, source, position, join_left, join_right):
+        self.source = source
+        self.source_name = source.name
+        self.position = position
+        self.join_left = join_left
+        self.join_right = join_right
+        self.name = f"{source.name}_liga_{position}"
+
+    def draw(self, pen, dc):
+        self.source._draw_joined(
+            pen,
+            dc,
+            join_left=self.join_left,
+            join_right=self.join_right,
+        )
 
 
 class LigatureGlyph(Glyph):

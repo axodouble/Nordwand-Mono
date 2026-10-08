@@ -15,7 +15,7 @@ from fontTools.misc.transform import Transform
 sys.path.insert(0, "src")
 from config import FontConfig as fc
 from config import DrawConfig
-from glyphs import LigatureGlyph
+from glyphs import InfiniteLigatureForm, LigatureGlyph
 from generate_font import discover_glyphs, select_style_glyphs, skew_path
 
 
@@ -366,6 +366,15 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
             ligature_map[seq] = g
     ligatures = sorted(ligature_map.keys(), key=len, reverse=True)
 
+    infinite_ligature_map = {}
+    glyphs_by_name = {g.name: g for g in active_glyphs}
+    for g in active_glyphs:
+        if not isinstance(g, InfiniteLigatureForm):
+            continue
+        source = glyphs_by_name[g.source_name]
+        char = chr(int(source.unicode, 16))
+        infinite_ligature_map.setdefault(char, {})[g.position] = g
+
     fig, ax = plt.subplots(1, 1, figsize=(max(6, len(text) * 1.5), 4), dpi=200)
 
     cursor_x = 0
@@ -379,8 +388,21 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
                 consumed = len(seq)
                 break
 
+        ch = text[i]
+        if glyph is None and ch in infinite_ligature_map:
+            joins_left = i > 0 and text[i - 1] == ch
+            joins_right = i + 1 < len(text) and text[i + 1] == ch
+            if joins_left or joins_right:
+                position = (
+                    "middle"
+                    if joins_left and joins_right
+                    else "end"
+                    if joins_left
+                    else "start"
+                )
+                glyph = infinite_ligature_map[ch][position]
+
         if glyph is None:
-            ch = text[i]
             if ch == " ":
                 cursor_x += fc.window_width
                 i += 1

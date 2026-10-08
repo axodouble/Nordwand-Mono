@@ -21,7 +21,9 @@ Some alternative character designs are available to tweak the vibe of the font t
 
 ## Ligatures
 
-Only two minimal ligatures are exposed with "->" and "=>". I might add a full set of ligatures later on, but I personally won't be using them.
+The font includes minimal `->` and `=>` ligatures. Repeated `=`, `-`, `_`, and
+`#` characters use contextual joining forms, allowing their horizontal bars to
+connect across runs of any length.
 
 ## Compile your own custom version
 
