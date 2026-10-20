@@ -527,7 +527,15 @@ def _monospace_panose():
     return panose
 
 
-def _style_metadata(weight, italic):
+def font_revision(version):
+    """Map a `major.minor.patch` release to an OpenType revision: 1.3.2 -> 1.302."""
+    major, minor, patch = (int(part) for part in version.split("."))
+    if minor > 9 or patch > 99:
+        raise ValueError(f"Version {version} does not fit a three-digit minor revision")
+    return major + (minor * 100 + patch) / 1000
+
+
+def _style_metadata(weight, italic, revision):
     """Compute style name, PS name, name table entries, and OS/2 flags for a weight/italic combination."""
     if weight not in WEIGHT_NAMES:
         raise ValueError(
@@ -556,7 +564,7 @@ def _style_metadata(weight, italic):
             "styleName": style_name,
             "uniqueFontIdentifier": ps_name,
             "fullName": full_name,
-            "version": "Version 1.000",
+            "version": f"Version {revision:.3f}",
             "psName": ps_name,
         }
     else:
@@ -567,7 +575,7 @@ def _style_metadata(weight, italic):
             "styleName": legacy_sub,
             "uniqueFontIdentifier": ps_name,
             "fullName": full_name,
-            "version": "Version 1.000",
+            "version": f"Version {revision:.3f}",
             "psName": ps_name,
             "typographicFamily": fc.family_name,
             "typographicSubfamily": style_name,
@@ -619,9 +627,10 @@ def build_font(
     woff=False,
     woff2=False,
     out_root="fonts",
+    revision=1.0,
 ):
     style_name, ps_style_name, name_table, fs_selection, mac_style = _style_metadata(
-        weight, italic
+        weight, italic, revision
     )
 
     if output_path is None:
@@ -670,6 +679,7 @@ def build_font(
             name_table,
             fs_selection,
             mac_style,
+            revision,
         )
 
     ttf_path = output_path.replace(".otf", ".ttf").replace("/otf", "/ttf")
@@ -683,6 +693,7 @@ def build_font(
             dc,
             ligature_glyphs,
             alternate_glyphs,
+            revision,
         )
 
     if woff or woff2:
@@ -706,6 +717,7 @@ def _build_otf(
     name_table,
     fs_selection,
     mac_style,
+    revision,
 ):
     # Build charstrings
     notdef_pen = T2CharStringPen(fc.window_width, None)
@@ -793,6 +805,7 @@ def _build_otf(
     timestamp = timestampNow()
     fb.setupHead(
         unitsPerEm=fc.units_per_em,
+        fontRevision=revision,
         macStyle=mac_style,
         created=timestamp,
         modified=timestamp,
@@ -817,13 +830,23 @@ def _build_otf(
 
 
 def build_ttf(
-    output_path, weight, italic, all_glyphs, cmap, dc, ligature_glyphs, alternate_glyphs
+    output_path,
+    weight,
+    italic,
+    all_glyphs,
+    cmap,
+    dc,
+    ligature_glyphs,
+    alternate_glyphs,
+    revision,
 ):
     """Build a TTF font with quadratic outlines from scratch."""
     from fontTools.pens.cu2quPen import Cu2QuPen
     from fontTools.pens.ttGlyphPen import TTGlyphPen
 
-    _, _, name_table, fs_selection, mac_style = _style_metadata(weight, italic)
+    _, _, name_table, fs_selection, mac_style = _style_metadata(
+        weight, italic, revision
+    )
 
     def record_ttf_glyph(glyph):
         path = simplify_glyph(glyph, dc=dc)
@@ -884,6 +907,7 @@ def build_ttf(
     timestamp = timestampNow()
     fb.setupHead(
         unitsPerEm=fc.units_per_em,
+        fontRevision=revision,
         macStyle=mac_style,
         created=timestamp,
         modified=timestamp,
@@ -924,7 +948,14 @@ if __name__ == "__main__":
         metavar="FILE.yml",
         help="YAML file whose values overwrite the default FontConfig values",
     )
+    parser.add_argument(
+        "--font-version",
+        default="1.0.0",
+        metavar="MAJOR.MINOR.PATCH",
+        help="Release version written to the name and head tables",
+    )
     args = parser.parse_args()
+    revision = font_revision(args.font_version)
 
     out_root = "fonts"
     if args.config:
@@ -949,6 +980,7 @@ if __name__ == "__main__":
             woff=args.web_font,
             woff2=args.web_font,
             out_root=out_root,
+            revision=revision,
         )
         build_font(
             weight=w,
@@ -958,4 +990,5 @@ if __name__ == "__main__":
             woff=args.web_font,
             woff2=args.web_font,
             out_root=out_root,
+            revision=revision,
         )

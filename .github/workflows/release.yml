@@ -31,7 +31,7 @@ jobs:
         run: make install
 
       - name: Build fonts
-        run: make build-font
+        run: make build-font FONT_VERSION="${{ github.event.release.tag_name }}"
 
       - name: Package fonts
         run: |
