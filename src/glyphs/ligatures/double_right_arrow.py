@@ -1,7 +1,7 @@
-from math import cos
 from glyphs import LigatureGlyph
-from draw.parallelogramm import draw_parallelogramm
-from draw.rect import draw_rect
+from draw.chevron import draw_chevron
+from draw.polygon import draw_polygon
+from glyphs.special.greater_than_sign import GreaterThanSignGlyph
 
 
 class RightArrowGlyph(LigatureGlyph):
@@ -17,7 +17,7 @@ class RightArrowGlyph(LigatureGlyph):
     width_ratio = 0.88
     overlap = 0.6
     side_offset = 0.05
-    span = 0.85
+    span = GreaterThanSignGlyph.span
     gap = 0.4
     rect_stroke_ratio = 0.92
     stroke_ratio = 1.2
@@ -33,40 +33,27 @@ class RightArrowGlyph(LigatureGlyph):
         g = self.gap * dc.window_width
         so = self.side_offset * dc.window_width
         x1 = so
-        draw_parallelogramm(
+        x_tip = b.x2 + dc.window_width
+        x_back = b.x1 + dc.window_width
+        draw_chevron(
             pen,
             dc.stroke_x,
             dc.stroke_y,
-            b.x2 + dc.window_width,
+            x_tip,
+            x_back,
             ymid,
-            b.x1 + dc.window_width,
-            ymid + h / 2,
-            direction="top-left",
+            h,
             delta=s2,
         )
-        theta, delta = draw_parallelogramm(
-            pen,
-            dc.stroke_x,
-            dc.stroke_y,
-            b.x1 + dc.window_width,
-            ymid - h / 2,
-            b.x2 + dc.window_width,
-            ymid,
-            direction="top-right",
-            delta=s2,
-        )
-        lb = 0.9 * g * cos(theta)
-        draw_rect(
-            pen,
-            x1,
-            dc.math + g / 2 - s / 2,
-            b.x2 + dc.window_width - lb,
-            dc.math + g / 2 + s / 2,
-        )
-        draw_rect(
-            pen,
-            x1,
-            dc.math - g / 2 - s / 2,
-            b.x2 + dc.window_width - lb,
-            dc.math - g / 2 + s / 2,
-        )
+
+        def x_end(y):
+            # Middle of the chevron stroke at height y, so the bar end stays
+            # inside the stroke whatever the chevron angle.
+            t = abs(y - ymid) / (h / 2)
+            return x_tip - t * (x_tip - x_back - s2) - s2 / 2
+
+        for yc in (ymid + g / 2, ymid - g / 2):
+            y1, y2 = yc - s / 2, yc + s / 2
+            draw_polygon(
+                pen, points=[(x1, y1), (x_end(y1), y1), (x_end(y2), y2), (x1, y2)]
+            )

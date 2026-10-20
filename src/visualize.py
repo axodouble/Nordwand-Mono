@@ -359,7 +359,7 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
         seq = ""
         for comp_name in g.components:
             for og in active_glyphs:
-                if og.name == comp_name and og.unicode:
+                if og.name == comp_name and og.unicode and not og.font_feature:
                     seq += chr(int(og.unicode, 16))
                     break
         if len(seq) == len(g.components):

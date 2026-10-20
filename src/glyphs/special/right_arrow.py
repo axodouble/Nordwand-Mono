@@ -1,5 +1,5 @@
 from glyphs import Glyph
-from draw.parallelogramm import draw_parallelogramm
+from draw.chevron import draw_chevron
 from draw.rect import draw_rect
 
 
@@ -26,28 +26,7 @@ class RightArrowGlyph(Glyph):
         x1 = self.side_offset_left * dc.window_width
         x2 = dc.window_width - self.side_offset_right * dc.window_width
         px1 = (1 - self.arrow_width) * dc.window_width
-        draw_parallelogramm(
-            pen,
-            s,
-            s,
-            x2,
-            ymid,
-            px1,
-            ymid + h / 2,
-            direction="top-left",
-            delta=s,
-        )
-        draw_parallelogramm(
-            pen,
-            s,
-            s,
-            px1,
-            ymid - h / 2,
-            x2,
-            ymid,
-            direction="top-right",
-            delta=s,
-        )
+        draw_chevron(pen, s, s, x2, px1, ymid, h, delta=s)
         draw_rect(
             pen,
             x1,
