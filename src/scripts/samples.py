@@ -41,7 +41,7 @@ if features.check_feature("raqm"):
     _orig_pil_text = ImageDraw.ImageDraw.text
 
     def _pil_text_with_features(self, *args, **kwargs):
-        kwargs.setdefault("features", ["liga", "calt"])
+        kwargs.setdefault("features", ["liga", "calt", "dlig"])
         return _orig_pil_text(self, *args, **kwargs)
 
     ImageDraw.ImageDraw.text = _pil_text_with_features

@@ -104,7 +104,7 @@ class InfiniteLigatureForm(Glyph):
     font_feature = None
     default_italic = False
     italic_only = False
-    feature_tags = ("calt",)
+    feature_tags = ("dlig",)
 
     def __init__(self, source, position, join_left, join_right):
         self.source = source

@@ -475,7 +475,8 @@ def build_gsub(glyph_names, ligature_glyphs, alternate_glyphs, cmap):
             lookups.append(chain_lookup)
 
     if infinite_lookup_indices:
-        add_feature("calt", infinite_lookup_indices)
+        for tag in ligature_feature_tags(infinite_forms[0]):
+            add_feature(tag, infinite_lookup_indices)
 
     gsub.LookupList = LookupList()
     gsub.LookupList.LookupCount = len(lookups)

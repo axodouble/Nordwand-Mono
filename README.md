@@ -22,8 +22,9 @@ Some alternative character designs are available to tweak the vibe of the font t
 ## Ligatures
 
 The font includes minimal `->` and `=>` ligatures. Repeated `=`, `-`, `_`, and
-`#` characters use contextual joining forms, allowing their horizontal bars to
-connect across runs of any length.
+`#` characters can use joining forms, allowing their horizontal bars to
+connect across runs of any length. These are off by default; enable the `dlig`
+feature to turn them on.
 
 ## Compile your own custom version
 
