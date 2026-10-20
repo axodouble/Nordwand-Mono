@@ -1,12 +1,13 @@
-# Stylistic Sets
+# Stylistic Sets and Optional Ligatures
 
-Stylistic sets are OpenType features that switch a group of related glyphs at
-once. They are off by default and can be turned on independently.
+These OpenType features switch a group of related glyphs at once. They are off
+by default and can be turned on independently.
 
 | Feature | Affects | Effect |
 | --- | --- | --- |
 | `ss02` | `->` `=>` | Turns on the arrow ligatures, even where standard ligatures (`liga`) are disabled |
 | `ss03` | `<` `>` `->` `=>` | Uses a wide angle for the comparison signs and the arrow heads |
+| `dlig` | `=` `-` `_` `#` | Joins the horizontal bars of repeated characters |
 
 ## `ss02` — arrow ligatures
 
@@ -28,14 +29,21 @@ ligatures the matching arrow head.
 
 `ss03` works together with `ss02`: with both on, the arrows use the wide head.
 
-## Enabling a stylistic set
+## `dlig` — joined repeated characters
+
+`dlig` (discretionary ligatures) joins runs of two or more `=`, `-`, `_` or
+`#` into a continuous line, e.g. for `====`, `----` or `____` separators. The
+run can be any length and every character keeps its own cell, so alignment and
+cursor movement are unaffected. Mixed runs such as `=-` are not joined.
+
+## Enabling a feature
 
 CSS:
 
 ```css
 code {
   font-family: "Nordwand Mono";
-  font-feature-settings: "ss02", "ss03";
+  font-feature-settings: "ss02", "ss03", "dlig";
 }
 ```
 
@@ -43,7 +51,7 @@ kitty (`kitty.conf`), once per style you use, with the PostScript names listed
 by `kitty +list-fonts --psnames`:
 
 ```
-font_features <PostScript name> +ss02 +ss03
+font_features <PostScript name> +ss02 +ss03 +dlig
 ```
 
 Ghostty:
@@ -51,12 +59,13 @@ Ghostty:
 ```
 font-feature = ss02
 font-feature = ss03
+font-feature = dlig
 ```
 
 WezTerm:
 
 ```lua
-config.harfbuzz_features = { "ss02", "ss03" }
+config.harfbuzz_features = { "ss02", "ss03", "dlig" }
 ```
 
 The same mechanism enables the character variants listed in the
