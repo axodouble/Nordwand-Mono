@@ -19,6 +19,10 @@ Amongst the inspirations for the design, you might identify:
 
 Some alternative character designs are available to tweak the vibe of the font to your liking. See the [alternative characters document](doc/alternative_characters.md) for a visual comparison and the corresponding OpenType feature tags.
 
+## Stylistic sets
+
+Stylistic sets switch groups of related glyphs at once: `ss02` enables the arrow ligatures and `ss03` uses wide-angled `<`, `>` and arrow heads. See the [stylistic sets document](doc/stylistic_sets.md) for details and how to enable them in common editors and terminals.
+
 ## Ligatures
 
 The font includes minimal `->` and `=>` ligatures. Repeated `=`, `-`, `_`, and
