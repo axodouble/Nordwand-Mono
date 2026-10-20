@@ -5,6 +5,7 @@
 | Feature | Character | Code point | Default | Alternative | Alternative glyph |
 | --- | --- | --- | --- | --- | --- |
 | `cv01=1` | `0` | `U+0030` | ![zero](alternative_characters/zero.png) | ![zero_slashed](alternative_characters/zero_slashed.png) | `zero_slashed` |
+| `cv02=1` | `a` | `U+0061` | ![lowercase_a_2](alternative_characters/lowercase_a_2.png) | ![lowercase_a_3](alternative_characters/lowercase_a_3.png) | `lowercase_a_3` |
 | `cv03=1` | `l` | `U+006C` | ![lowercase_l](alternative_characters/lowercase_l.png) | ![lowercase_l_2](alternative_characters/lowercase_l_2.png) | `lowercase_l_2` |
 | `cv11=1` | `f` | `U+0066` | ![lowercase_f](alternative_characters/lowercase_f.png) | ![lowercase_f_3](alternative_characters/lowercase_f_3.png) | `lowercase_f_3` |
 | `cv11=1` | `f` | `U+0066` | ![lowercase_f_2](alternative_characters/lowercase_f_2.png) | ![lowercase_f_4](alternative_characters/lowercase_f_4.png) | `lowercase_f_4` |
