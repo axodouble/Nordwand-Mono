@@ -25,7 +25,6 @@ class ThreeGlyph(NumberGlyph):
             offset=self.offset,
             height="cap",
             overshoot_bottom=True,
-            overshoot_top=True,
             overshoot_right=True,
             width_ratio=self.width_ratio,
             number=True,
