@@ -18,6 +18,7 @@ class Glyph(ABC):
 
     number_characters: int = 1
     font_feature: dict = None
+    alternative_character_comment: str = None
     default_italic: bool = False
     italic_only: bool = False
 
