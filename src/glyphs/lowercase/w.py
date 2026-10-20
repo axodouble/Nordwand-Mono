@@ -10,10 +10,10 @@ class LowercaseWGlyph(Glyph):
     unicode = "0x77"
     offset = 0
     overlap = 1
-    outer_branch_ratio = 0.25
+    outer_branch_ratio = 0.265
     inner_height = 1
     width_ratio = 1.27
-    stroke_ratio = 1.1
+    stroke_ratio = 1
     lower_section_height = 1.2
 
     def draw(self, pen, dc):
@@ -23,7 +23,7 @@ class LowercaseWGlyph(Glyph):
             # min_margin=dc.min_margin_lowercase,
         )
         tsx = dc.stroke_x * self.stroke_ratio
-        sx = max(0, 0.9 * (tsx - dc.default_stroke)) + min(dc.default_stroke, tsx)
+        sx = max(0, 0.7 * (tsx - dc.default_stroke)) + min(dc.default_stroke, tsx)
         ov = self.overlap * sx
         xi1 = b.x1 + self.outer_branch_ratio * b.width
         xi2 = b.x2 - self.outer_branch_ratio * b.width

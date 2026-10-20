@@ -41,7 +41,7 @@ if features.check_feature("raqm"):
     _orig_pil_text = ImageDraw.ImageDraw.text
 
     def _pil_text_with_features(self, *args, **kwargs):
-        kwargs.setdefault("features", ["liga", "calt"])
+        kwargs.setdefault("features", ["liga", "calt", "dlig"])
         return _orig_pil_text(self, *args, **kwargs)
 
     ImageDraw.ImageDraw.text = _pil_text_with_features
@@ -234,16 +234,27 @@ def _cyrillic_sample(font_path):
             for start in range(0, len(characters), width)
         )
 
-    uppercase = "".join(
-        chr(codepoint)
-        for codepoint in sorted(codepoints)
-        if is_cyrillic(codepoint) and unicodedata.category(chr(codepoint)) == "Lu"
-    )
-    lowercase = "".join(
-        chr(codepoint)
-        for codepoint in sorted(codepoints)
-        if is_cyrillic(codepoint) and unicodedata.category(chr(codepoint)) == "Ll"
-    )
+    def letters(category):
+        # Order each letter by its capital form, basic А–Я first, so the
+        # uppercase and lowercase rows line up pair by pair.
+        def key(character):
+            capital = ord(character.upper()[0])
+            return (not 0x0410 <= capital <= 0x042F, capital)
+
+        return "".join(
+            sorted(
+                (
+                    chr(codepoint)
+                    for codepoint in codepoints
+                    if is_cyrillic(codepoint)
+                    and unicodedata.category(chr(codepoint)) == category
+                ),
+                key=key,
+            )
+        )
+
+    uppercase = letters("Lu")
+    lowercase = letters("Ll")
 
     return f"""\
 {rows(uppercase)}

@@ -18,3 +18,8 @@ build-otf:
 
 install-mac:
 	cp -r fonts/otf/NordwandMono-*.otf ~/Library/Fonts
+
+visualize:
+	open -n -a /Library/Frameworks/Python.framework/Versions/3.12/Resources/Python.app \
+    --env "__PYVENV_LAUNCHER__=$PWD/.venv/bin/python" \
+    --args -m visualize lowercase_a

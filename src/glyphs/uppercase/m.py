@@ -16,7 +16,7 @@ class UppercaseMGlyph(UppercaseGlyph):
     depth = 0.6
     inner_thickness_ratio = 2.4
     inner_height = 0.2
-    width_ratio = 1.18
+    width_ratio = 1.16
     ink_trap_height = 0.7
 
     def draw(self, pen, dc):
@@ -27,7 +27,7 @@ class UppercaseMGlyph(UppercaseGlyph):
             min_margin=dc.min_margin_uppercase,
         )
         tsx = dc.stroke_x * self.stroke_x_ratio
-        sx = max(0, 0.65 * (tsx - 90)) + min(90, tsx)
+        sx = max(0, 0.6 * (tsx - 90)) + min(90, tsx)
         delta = self.inner_thickness_ratio * sx
         yi = b.y1 + self.inner_height * b.height
         yik = b.y1 + self.ink_trap_height * b.height

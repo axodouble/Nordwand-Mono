@@ -11,7 +11,7 @@ class UppercaseAGlyph(UppercaseGlyph):
     bar_height = 0.38
     overlap = 0.5
     stroke_x_ratio = 1.02
-    width_ratio = 1.25
+    width_ratio = 1.2
 
     def draw(self, pen, dc):
         b = dc.body_bounds(

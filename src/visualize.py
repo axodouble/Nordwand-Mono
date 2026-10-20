@@ -15,7 +15,7 @@ from fontTools.misc.transform import Transform
 sys.path.insert(0, "src")
 from config import FontConfig as fc
 from config import DrawConfig
-from glyphs import LigatureGlyph
+from glyphs import InfiniteLigatureForm, LigatureGlyph
 from generate_font import discover_glyphs, select_style_glyphs, skew_path
 
 
@@ -141,7 +141,12 @@ def overlay_reference(ax, font_path, char, show_controls, rescale=False):
 
     path = recording_to_mpl_path(out)
     patch = mpatches.PathPatch(
-        path, facecolor="none", edgecolor="#111", linewidth=1.5, linestyle="--", alpha=0.9
+        path,
+        facecolor="none",
+        edgecolor="#111",
+        linewidth=1.5,
+        linestyle="--",
+        alpha=0.9,
     )
     ax.add_patch(patch)
     if show_controls:
@@ -149,11 +154,11 @@ def overlay_reference(ax, font_path, char, show_controls, rescale=False):
 
     scaled_adv = scale * ref_adv
     ax.axvline(scaled_adv, color="#111", linewidth=1.2, linestyle="--", alpha=0.7)
-    ax.text(scaled_adv, fc.window_descent, " ref adv", fontsize=7, color="#111", va="bottom")
-
-    basis = (
-        f"cell width={fc.window_width}" if rescale else f"x-height={fc.x_height}"
+    ax.text(
+        scaled_adv, fc.window_descent, " ref adv", fontsize=7, color="#111", va="bottom"
     )
+
+    basis = f"cell width={fc.window_width}" if rescale else f"x-height={fc.x_height}"
     lo, hi = _recording_x_bounds(out)
     print(
         f"Reference '{char}' from {font_path}: scale={scale:.3f}; "
@@ -354,12 +359,21 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
         seq = ""
         for comp_name in g.components:
             for og in active_glyphs:
-                if og.name == comp_name and og.unicode:
+                if og.name == comp_name and og.unicode and not og.font_feature:
                     seq += chr(int(og.unicode, 16))
                     break
         if len(seq) == len(g.components):
             ligature_map[seq] = g
     ligatures = sorted(ligature_map.keys(), key=len, reverse=True)
+
+    infinite_ligature_map = {}
+    glyphs_by_name = {g.name: g for g in active_glyphs}
+    for g in active_glyphs:
+        if not isinstance(g, InfiniteLigatureForm):
+            continue
+        source = glyphs_by_name[g.source_name]
+        char = chr(int(source.unicode, 16))
+        infinite_ligature_map.setdefault(char, {})[g.position] = g
 
     fig, ax = plt.subplots(1, 1, figsize=(max(6, len(text) * 1.5), 4), dpi=200)
 
@@ -369,13 +383,26 @@ def visualize_text(text, point_size=None, guides=False, dc=None, italic=False):
         glyph = None
         consumed = 1
         for seq in ligatures:
-            if text[i:i + len(seq)] == seq:
+            if text[i : i + len(seq)] == seq:
                 glyph = ligature_map[seq]
                 consumed = len(seq)
                 break
 
+        ch = text[i]
+        if glyph is None and ch in infinite_ligature_map:
+            joins_left = i > 0 and text[i - 1] == ch
+            joins_right = i + 1 < len(text) and text[i + 1] == ch
+            if joins_left or joins_right:
+                position = (
+                    "middle"
+                    if joins_left and joins_right
+                    else "end"
+                    if joins_left
+                    else "start"
+                )
+                glyph = infinite_ligature_map[ch][position]
+
         if glyph is None:
-            ch = text[i]
             if ch == " ":
                 cursor_x += fc.window_width
                 i += 1
@@ -469,8 +496,12 @@ if __name__ == "__main__":
         nargs="?",
         help="Glyph slug name (e.g. lowercase_o). Ignored when -t is used.",
     )
-    parser.add_argument("-t", "--text", type=str, default=None, help="Render a text string")
-    parser.add_argument("-c", action="store_true", help="Show bezier control points (construction)")
+    parser.add_argument(
+        "-t", "--text", type=str, default=None, help="Render a text string"
+    )
+    parser.add_argument(
+        "-c", action="store_true", help="Show bezier control points (construction)"
+    )
     parser.add_argument("-o", action="store_true", help="Show optical center")
     parser.add_argument(
         "-s",
@@ -482,7 +513,9 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument("--pt", type=float, default=None, help="Point size (text mode)")
-    parser.add_argument("--guides", action="store_true", help="Show helper lines (text mode)")
+    parser.add_argument(
+        "--guides", action="store_true", help="Show helper lines (text mode)"
+    )
     parser.add_argument(
         "--config",
         metavar="FILE.yml",
@@ -534,8 +567,7 @@ if __name__ == "__main__":
         configs = [DrawConfig() if w == 400 else DrawConfig.weight(w=w)]
     else:
         configs = [
-            DrawConfig(stroke_x=int(s), stroke_y=int(s) - 10)
-            for s in args.s.split(",")
+            DrawConfig(stroke_x=int(s), stroke_y=int(s) - 10) for s in args.s.split(",")
         ]
 
     if args.text is not None:

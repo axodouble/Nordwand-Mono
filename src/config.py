@@ -28,7 +28,7 @@ class FontConfig:
     parenthesis_length: int = 1060
 
     min_margin_lowercase: int = 26
-    min_margin_uppercase: int = 32.5
+    min_margin_uppercase: int = 38
 
     italic_angle: float = 9.4
 

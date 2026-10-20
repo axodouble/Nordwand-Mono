@@ -36,7 +36,13 @@ from fontTools.ttLib import newTable
 
 from config import FontConfig as fc
 from config import DrawConfig
-from glyphs import Glyph, LigatureGlyph, ContextualLigatureGlyph
+from glyphs import (
+    Glyph,
+    LigatureGlyph,
+    ContextualLigatureGlyph,
+    InfiniteLigatureGlyph,
+    InfiniteLigatureForm,
+)
 
 import glyphs
 
@@ -59,12 +65,21 @@ def discover_glyphs():
     def all_subclasses(cls):
         result = []
         for sub in cls.__subclasses__():
-            if not inspect.isabstract(sub):
+            if not inspect.isabstract(sub) and not getattr(
+                sub, "generated_only", False
+            ):
                 result.append(sub)
             result.extend(all_subclasses(sub))
         return result
 
-    return [cls() for cls in all_subclasses(Glyph)]
+    discovered = [cls() for cls in all_subclasses(Glyph)]
+    joining_forms = [
+        form
+        for glyph in discovered
+        if isinstance(glyph, InfiniteLigatureGlyph)
+        for form in glyph.ligature_forms()
+    ]
+    return discovered + joining_forms
 
 
 def draw_notdef(pen):
@@ -286,7 +301,9 @@ def build_gsub(glyph_names, ligature_glyphs, alternate_glyphs, cmap):
     regular_ligs = [
         g
         for g in ligature_glyphs
-        if not isinstance(g, ContextualLigatureGlyph) and g.name in glyph_names
+        if isinstance(g, LigatureGlyph)
+        and not isinstance(g, ContextualLigatureGlyph)
+        and g.name in glyph_names
     ]
     contextual_ligs = [
         g
@@ -391,6 +408,75 @@ def build_gsub(glyph_names, ligature_glyphs, alternate_glyphs, cmap):
 
     for tag, lookup_indices in sorted(contextual_lookup_indices.items()):
         add_feature(tag, lookup_indices)
+
+    # Infinite ligatures keep one glyph per cell and use three contextual
+    # passes: mark every non-final cell, turn marked interior cells into
+    # middles, then mark the final cell. This works for runs of any length.
+    infinite_forms = [
+        g
+        for g in ligature_glyphs
+        if isinstance(g, InfiniteLigatureForm) and g.name in glyph_names
+    ]
+    forms_by_source = {}
+    for form in infinite_forms:
+        forms_by_source.setdefault(form.source_name, {})[form.position] = form
+
+    infinite_lookup_indices = []
+    for position in ("start", "middle", "end"):
+        for source_name, forms in sorted(forms_by_source.items()):
+            if set(forms) != {"start", "middle", "end"}:
+                raise ValueError(
+                    f"Infinite ligature {source_name!r} requires start, middle, "
+                    "and end forms"
+                )
+
+            start = forms["start"].name
+            middle = forms["middle"].name
+            replacement = forms[position].name
+            if position == "start":
+                input_name = source_name
+                backtrack = []
+                lookahead = [source_name]
+            elif position == "middle":
+                input_name = start
+                backtrack = [[start, middle]]
+                lookahead = []
+            else:
+                input_name = source_name
+                backtrack = [[start, middle]]
+                lookahead = []
+
+            nested_subst = SingleSubst()
+            nested_subst.mapping = {input_name: replacement}
+            nested_lookup = Lookup()
+            nested_lookup.LookupType = 1
+            nested_lookup.LookupFlag = 0
+            nested_lookup.SubTableCount = 1
+            nested_lookup.SubTable = [nested_subst]
+            nested_idx = len(lookups)
+            lookups.append(nested_lookup)
+
+            rec = SubstLookupRecord()
+            rec.SequenceIndex = 0
+            rec.LookupListIndex = nested_idx
+            chain_lookup = Lookup()
+            chain_lookup.LookupType = 6
+            chain_lookup.LookupFlag = 0
+            chain_lookup.SubTable = [
+                _chain_subtable(
+                    input_seq=[input_name],
+                    backtrack=backtrack,
+                    lookahead=lookahead,
+                    subst_records=[rec],
+                )
+            ]
+            chain_lookup.SubTableCount = 1
+            infinite_lookup_indices.append(len(lookups))
+            lookups.append(chain_lookup)
+
+    if infinite_lookup_indices:
+        for tag in ligature_feature_tags(infinite_forms[0]):
+            add_feature(tag, infinite_lookup_indices)
 
     gsub.LookupList = LookupList()
     gsub.LookupList.LookupCount = len(lookups)
@@ -566,7 +652,7 @@ def build_font(
             alternate_glyphs.append(g)
         elif g.unicode:
             cmap[int(g.unicode, 16)] = g.name
-        if isinstance(g, LigatureGlyph):
+        if isinstance(g, (LigatureGlyph, InfiniteLigatureForm)):
             ligature_glyphs.append(g)
 
     if otf:

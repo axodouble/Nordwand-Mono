@@ -7,12 +7,11 @@ class UppercaseBGlyph(UppercaseGlyph):
     name = "uppercase_b"
     unicode = "0x42"
     offset = 20
-    upper_ratio = 0.85  # Upper loop width as a fraction of the lower loop width
+    upper_ratio = 0.88  # Upper loop width as a fraction of the lower loop width
     mid_ratio = 0.515
-    width_ratio = 1.06
+    width_ratio = 1.0
     hx_ratio = 1
     hy_ratio = 1
-
 
     def draw(self, pen, dc):
         b = dc.body_bounds(

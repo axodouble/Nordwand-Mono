@@ -15,8 +15,10 @@ from glyphs.lowercase.round.c import LowercaseCGlyph
 from glyphs.lowercase.square.u import LowercaseUGlyph
 from glyphs.lowercase.square.n import LowercaseNGlyph
 from glyphs.lowercase.dotted.i import LowercaseIGlyph
+from glyphs.lowercase.dotted.i_2 import LowercaseI2Glyph
 from glyphs.lowercase.y import LowercaseYGlyph
 from glyphs.lowercase.s import LowercaseSGlyph
+from glyphs.lowercase.single_story.g import LowercaseGGlyph
 
 from glyphs.uppercase.a import UppercaseAGlyph
 from glyphs.uppercase.e import UppercaseEGlyph
@@ -27,6 +29,7 @@ from glyphs.uppercase.n import UppercaseNGlyph
 from glyphs.uppercase.c import UppercaseCGlyph
 from glyphs.uppercase.y import UppercaseYGlyph
 from glyphs.uppercase.s import UppercaseSGlyph
+from glyphs.uppercase.g import UppercaseGGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -37,6 +40,8 @@ from glyphs.accents.caron import Caron
 from glyphs.accents.ring import Ring
 from glyphs.accents.cedilla import Cedilla
 from glyphs.accents.macron import Macron
+from glyphs.accents.breve import Breve
+from glyphs.accents.dot import DotAbove
 
 # Heights for accent positioning
 _lc_accent = fc.accent
@@ -324,6 +329,14 @@ class LowercaseCCedillaGlyph(ComposedGlyph):
     accent_y = _cedilla_y
 
 
+class LowercaseSCedillaGlyph(ComposedGlyph):
+    name = "lowercase_scedilla"
+    unicode = "0x15F"
+    base_glyph_class = LowercaseSGlyph
+    accent_class = Cedilla
+    accent_y = _cedilla_y
+
+
 # ── Lowercase with caron ─────────────────────────────────────────────
 
 
@@ -333,6 +346,36 @@ class LowercaseSCaronGlyph(ComposedGlyph):
     base_glyph_class = LowercaseSGlyph
     accent_class = Caron
     accent_y = _lc_accent
+
+
+# ── Lowercase with breve ─────────────────────────────────────────────
+
+
+class LowercaseGBreveGlyph(ComposedGlyph):
+    name = "lowercase_gbreve"
+    unicode = "0x11F"
+    base_glyph_class = LowercaseGGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+# ── Dotless i ────────────────────────────────────────────────────────
+
+
+class LowercaseDotlessIGlyph(LowercaseIGlyph):
+    name = "lowercase_dotlessi"
+    unicode = "0x131"
+
+    def draw(self, pen, dc):
+        self.draw_base(pen, dc)
+
+
+class LowercaseDotlessI2Glyph(LowercaseI2Glyph):
+    name = "lowercase_dotlessi_2"
+    unicode = "0x131"
+
+    def draw(self, pen, dc):
+        self.draw_base(pen, dc)
 
 
 # ── Uppercase with acute ─────────────────────────────────────────────
@@ -564,6 +607,14 @@ class UppercaseCCedillaGlyph(ComposedGlyph):
     accent_y = _cedilla_y
 
 
+class UppercaseSCedillaGlyph(ComposedGlyph):
+    name = "uppercase_scedilla"
+    unicode = "0x15E"
+    base_glyph_class = UppercaseSGlyph
+    accent_class = Cedilla
+    accent_y = _cedilla_y
+
+
 # ── Uppercase with caron ─────────────────────────────────────────────
 
 
@@ -572,6 +623,28 @@ class UppercaseSCaronGlyph(ComposedGlyph):
     unicode = "0x160"
     base_glyph_class = UppercaseSGlyph
     accent_class = Caron
+    accent_y = _uc_accent
+
+
+# ── Uppercase with breve ─────────────────────────────────────────────
+
+
+class UppercaseGBreveGlyph(ComposedGlyph):
+    name = "uppercase_gbreve"
+    unicode = "0x11E"
+    base_glyph_class = UppercaseGGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
+
+
+# ── Uppercase with dot above ─────────────────────────────────────────
+
+
+class UppercaseIDotGlyph(ComposedGlyph):
+    name = "uppercase_idotaccent"
+    unicode = "0x130"
+    base_glyph_class = UppercaseIGlyph
+    accent_class = DotAbove
     accent_y = _uc_accent
 
 
