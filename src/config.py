@@ -8,6 +8,7 @@ class FontConfig:
     """Default metrics used for the project, can be overwritten with a yaml file"""
 
     family_name: str = "Nordwand Mono"
+    font_revision: float = 1.0
 
     units_per_em: int = 1000
     window_ascent: int = 1025
