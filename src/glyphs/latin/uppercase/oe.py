@@ -5,7 +5,7 @@ from draw.arch import draw_arch
 
 class UppercaseOeGlyph(UppercaseGlyph):
     name = "uppercase_oe"
-    unicode = "0x153"
+    unicode = "0x152"
     offset = 0
     bar_height = 0.35
     overlap = 0.25
