@@ -5,6 +5,7 @@ import importlib
 import inspect
 import math
 import pkgutil
+import re
 
 import pathops
 from fontTools.fontBuilder import FontBuilder
@@ -529,9 +530,12 @@ def _monospace_panose():
 
 def font_revision(version):
     """Map a `major.minor.patch` release to an OpenType revision: 1.3.2 -> 1.302."""
-    major, minor, patch = (int(part) for part in version.split("."))
-    if minor > 9 or patch > 99:
-        raise ValueError(f"Version {version} does not fit a three-digit minor revision")
+    match = re.fullmatch(r"(\d+)\.(\d)\.(\d{1,2})", version)
+    if not match:
+        raise ValueError(
+            f"Version {version} must be MAJOR.MINOR.PATCH, MINOR < 10, PATCH < 100"
+        )
+    major, minor, patch = (int(part) for part in match.groups())
     return major + (minor * 100 + patch) / 1000
 
 
@@ -936,12 +940,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--font-version",
-        default="1.0.0",
         metavar="MAJOR.MINOR.PATCH",
         help="Release version written to the name and head tables",
     )
     args = parser.parse_args()
-    fc.font_revision = font_revision(args.font_version)
 
     out_root = "fonts"
     if args.config:
@@ -954,6 +956,9 @@ if __name__ == "__main__":
         font_name = fc.family_name.replace(" ", "")
         out_root = f"custom-fonts/{font_name}"
         print(f"Writing custom fonts to ./{out_root}/")
+
+    if args.font_version:
+        fc.font_revision = font_revision(args.font_version)
 
     build_otf = not args.ttf
     build_ttf_flag = not args.otf
