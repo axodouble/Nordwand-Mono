@@ -555,7 +555,7 @@ def _style_metadata(weight, italic):
         style_name = f"{weight_name} Italic" if italic else weight_name
 
     ps_style_name = style_name.replace(" ", "")
-    ps_name = f"{fc.family_name}-{ps_style_name}"
+    ps_name = f"{fc.family_name.replace(' ', '')}-{ps_style_name}"
     full_name = f"{fc.family_name} {style_name}"
 
     # RIBBI = Regular/Bold/Italic/BoldItalic — macOS style-links these under one family.
@@ -678,7 +678,6 @@ def build_font(
             ligature_glyphs,
             alternate_glyphs,
             style_name,
-            ps_style_name,
             name_table,
             fs_selection,
             mac_style,
@@ -714,7 +713,6 @@ def _build_otf(
     ligature_glyphs,
     alternate_glyphs,
     style_name,
-    ps_style_name,
     name_table,
     fs_selection,
     mac_style,
@@ -762,7 +760,7 @@ def _build_otf(
     ]
 
     fb.setupCFF(
-        psName=f"{fc.family_name}-{ps_style_name}",
+        psName=name_table["psName"],
         fontInfo={
             "FullName": f"{fc.family_name} {style_name}",
             "isFixedPitch": True,
