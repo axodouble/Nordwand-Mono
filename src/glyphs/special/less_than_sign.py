@@ -1,16 +1,16 @@
 from glyphs import Glyph
-from glyphs.special.greater_than_sign import GreaterThanSignGlyph
+from glyphs.special.greater_than_sign import GreaterThenSignGlyph
 from draw.chevron import draw_chevron
 
 
-class LessThanSignGlyph(Glyph):
+class LessThenSignGlyph(Glyph):
     name = "less_than_sign"
     unicode = "0x3C"
     offset = 0
     width_ratio = 1
     overlap = 0.6
-    span = GreaterThanSignGlyph.span
-    stroke_ratio = 1.5
+    span = GreaterThenSignGlyph.span
+    stroke_ratio = 1.2
 
     def draw(self, pen, dc):
         b = dc.body_bounds(

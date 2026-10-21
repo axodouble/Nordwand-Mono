@@ -100,3 +100,9 @@ class SharpSGlyph(Glyph):
             (lower_x1 + lower_x2) / 2,
             b.y1 + sy,
         )
+
+
+class CapitalSharpSGlyph(SharpSGlyph):
+    name = "capital_sharp_s"
+    unicode = "0x1e9e"
+    tail_reach = 0

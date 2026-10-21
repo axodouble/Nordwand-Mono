@@ -1,9 +1,8 @@
-from glyphs.special.greater_than_sign_2 import GreaterThanSign2Glyph
-from glyphs.special.less_than_sign import LessThanSignGlyph
+from glyphs.special.greater_than_sign_2 import GreaterThenSign2Glyph
+from glyphs.special.less_than_sign import LessThenSignGlyph
 
 
-class LessThanSign2Glyph(LessThanSignGlyph):
+class LessThenSign2Glyph(LessThenSignGlyph):
     name = "less_than_sign_2"
     font_feature = {"ss03": 1}
-    span = GreaterThanSign2Glyph.span
-    stroke_ratio = 1.2
+    span = GreaterThenSign2Glyph.span

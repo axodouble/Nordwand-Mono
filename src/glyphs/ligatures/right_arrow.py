@@ -1,6 +1,6 @@
 from glyphs import LigatureGlyph
 from draw.chevron import draw_chevron
-from glyphs.special.greater_than_sign import GreaterThanSignGlyph
+from glyphs.special.greater_than_sign import GreaterThenSignGlyph
 from draw.rect import draw_rect
 
 
@@ -17,7 +17,7 @@ class RightArrowGlyph(LigatureGlyph):
     width_ratio = 0.88
     overlap = 0.6
     side_offset = 0.05
-    span = GreaterThanSignGlyph.span
+    span = GreaterThenSignGlyph.span
     gap = 0.0
     stroke_ratio = 1.2
 

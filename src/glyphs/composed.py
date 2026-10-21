@@ -52,6 +52,10 @@ class ComposedGlyph(Glyph, ABC):
     def offset(self):
         return self.base_glyph_class.offset
 
+    def accent_x(self, dc, base, b):
+        """Horizontal anchor of the accent; centered on the body by default."""
+        return b.xmid + base.accent_x_offset
+
     def draw(self, pen, dc):
         base_class = self._resolve_base_class(dc)
         base = base_class()
@@ -59,4 +63,4 @@ class ComposedGlyph(Glyph, ABC):
 
         b = dc.body_bounds(offset=base_class.offset)
         accent_y = self.accent_y if self.accent_y is not None else dc.accent
-        self.accent_class().draw_at(pen, dc, x=b.xmid + base_class.accent_x_offset, y=accent_y)
+        self.accent_class().draw_at(pen, dc, x=self.accent_x(dc, base, b), y=accent_y)

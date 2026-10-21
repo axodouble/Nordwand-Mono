@@ -10,12 +10,18 @@ class LowercaseLGlyph(Glyph):
     width_ratio = 1.16
     mid_ratio = 0.45
 
+    def stem_center(self, dc):
+        b = dc.body_bounds(
+            offset=self.offset, height="ascent", width_ratio=self.width_ratio
+        )
+        return b.x1 + self.mid_ratio * b.width
+
     def draw(self, pen, dc):
         b = dc.body_bounds(
             offset=self.offset, height="ascent", width_ratio=self.width_ratio
         )
         ym4 = b.y1 + b.height / 4
-        xmid = b.x1 + self.mid_ratio * b.width
+        xmid = self.stem_center(dc)
 
         # Stem
         draw_rect(pen, xmid - dc.stroke_x / 2, ym4, xmid + dc.stroke_x / 2, dc.ascent)
