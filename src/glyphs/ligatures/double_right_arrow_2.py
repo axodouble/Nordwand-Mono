@@ -1,5 +1,5 @@
 from glyphs.ligatures.double_right_arrow import RightArrowGlyph as DoubleRightArrowGlyph
-from glyphs.special.greater_than_sign_2 import GreaterThanSign2Glyph
+from glyphs.special.greater_than_sign_2 import GreaterThenSign2Glyph
 
 
 class DoubleRightArrow2Glyph(DoubleRightArrowGlyph):
@@ -7,4 +7,4 @@ class DoubleRightArrow2Glyph(DoubleRightArrowGlyph):
 
     name = "double_right_arrow_liga_2"
     components = ["equals_sign", "greater_than_sign_2"]
-    span = GreaterThanSign2Glyph.span
+    span = GreaterThenSign2Glyph.span

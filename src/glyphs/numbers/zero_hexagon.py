@@ -66,7 +66,7 @@ class ZeroHexagonGlyph(ZeroGlyph):
     name = "zero_hexagon"
     font_feature = {"cv01": 2}
     width_ratio = 1.2
-    flat_ratio = 0.7  # Half-length of the flat top / bottom, relative to half-width
+    flat_ratio = 0.4  # Half-length of the flat top / bottom, relative to half-width
     corner_radius = 1.0  # Outer corner radius, in stroke widths
     dot_stroke_ratio = 1.1
     dot_fill = 0.6  # Max dot side, as a fraction of the counter's half-width
@@ -111,12 +111,8 @@ class ZeroHexagonGlyph(ZeroGlyph):
 
         # Cap the dot to the counter's width so it keeps some air around it
         # at heavy weights, where the counter gets small.
-        sd = min(dc.stroke_x * self.dot_stroke_ratio, 140)
-        draw_rect(
-            pen,
-            b.xmid - sd / 2,
-            b.ymid - sd / 2,
-            b.xmid + sd / 2,
-            b.ymid + sd / 2,
+        inner_half_width = inner[0][0] - cx
+        d = min(
+            dc.stroke_x * self.dot_stroke_ratio, 140, self.dot_fill * inner_half_width
         )
-        draw_rect(pen, cx - sd / 2, cy - sd / 2, cx + sd / 2, cy + sd / 2)
+        draw_rect(pen, cx - d / 2, cy - d / 2, cx + d / 2, cy + d / 2)

@@ -23,7 +23,6 @@ class SharpSGlyph(Glyph):
             offset=self.offset,
             height="cap",
             uppercase=True,
-            overshoot_top=True,
             width_ratio=self.width_ratio,
         )
         sx, sy = dc.stroke_x * self.stroke_x_ratio, dc.stroke_y * self.stroke_y_ratio

@@ -19,6 +19,8 @@ from glyphs.lowercase.dotted.i_2 import LowercaseI2Glyph
 from glyphs.lowercase.y import LowercaseYGlyph
 from glyphs.lowercase.s import LowercaseSGlyph
 from glyphs.lowercase.single_story.g import LowercaseGGlyph
+from glyphs.lowercase.l import LowercaseLGlyph
+from glyphs.lowercase.z import LowercaseZGlyph
 
 from glyphs.uppercase.a import UppercaseAGlyph
 from glyphs.uppercase.e import UppercaseEGlyph
@@ -30,6 +32,8 @@ from glyphs.uppercase.c import UppercaseCGlyph
 from glyphs.uppercase.y import UppercaseYGlyph
 from glyphs.uppercase.s import UppercaseSGlyph
 from glyphs.uppercase.g import UppercaseGGlyph
+from glyphs.uppercase.l import UppercaseLGlyph
+from glyphs.uppercase.z import UppercaseZGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -42,6 +46,10 @@ from glyphs.accents.cedilla import Cedilla
 from glyphs.accents.macron import Macron
 from glyphs.accents.breve import Breve
 from glyphs.accents.dot import DotAbove
+from glyphs.accents.ogonek import Ogonek
+from glyphs.accents.stroke import Stroke, UppercaseStroke
+import pathops
+from draw.rect import draw_rect
 
 # Heights for accent positioning
 _lc_accent = fc.accent
@@ -689,3 +697,207 @@ class UppercaseUMacronGlyph(ComposedGlyph):
     base_glyph_class = UppercaseUGlyph
     accent_class = Macron
     accent_y = _uc_accent
+
+
+# ── Polish: acute ────────────────────────────────────────────────────
+
+
+class LowercaseCAcuteGlyph(ComposedGlyph):
+    name = "lowercase_cacute"
+    unicode = "0x107"
+    base_glyph_class = LowercaseCGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class LowercaseNAcuteGlyph(ComposedGlyph):
+    name = "lowercase_nacute"
+    unicode = "0x144"
+    base_glyph_class = LowercaseNGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class LowercaseSAcuteGlyph(ComposedGlyph):
+    name = "lowercase_sacute"
+    unicode = "0x15B"
+    base_glyph_class = LowercaseSGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class LowercaseZAcuteGlyph(ComposedGlyph):
+    name = "lowercase_zacute"
+    unicode = "0x17A"
+    base_glyph_class = LowercaseZGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class UppercaseCAcuteGlyph(ComposedGlyph):
+    name = "uppercase_cacute"
+    unicode = "0x106"
+    base_glyph_class = UppercaseCGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+class UppercaseNAcuteGlyph(ComposedGlyph):
+    name = "uppercase_nacute"
+    unicode = "0x143"
+    base_glyph_class = UppercaseNGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+class UppercaseSAcuteGlyph(ComposedGlyph):
+    name = "uppercase_sacute"
+    unicode = "0x15A"
+    base_glyph_class = UppercaseSGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+class UppercaseZAcuteGlyph(ComposedGlyph):
+    name = "uppercase_zacute"
+    unicode = "0x179"
+    base_glyph_class = UppercaseZGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+# ── Polish: dot above ────────────────────────────────────────────────
+
+
+class LowercaseZDotGlyph(ComposedGlyph):
+    name = "lowercase_zdotaccent"
+    unicode = "0x17C"
+    base_glyph_class = LowercaseZGlyph
+    accent_class = DotAbove
+    accent_y = _lc_accent
+
+
+class UppercaseZDotGlyph(ComposedGlyph):
+    name = "uppercase_zdotaccent"
+    unicode = "0x17B"
+    base_glyph_class = UppercaseZGlyph
+    accent_class = DotAbove
+    accent_y = _uc_accent
+
+
+# ── Polish: ogonek ───────────────────────────────────────────────────
+
+
+class OgonekComposedGlyph(ComposedGlyph):
+    """Hangs the ogonek from the base glyph's measured outline, so it follows
+    the real shape of each base (including italic variants)."""
+
+    accent_class = Ogonek
+    accent_y = 0
+    # Hang from the rightmost stem, spanning it from its inner to its outer
+    # edge. Otherwise the hook is a stem wide and placed by `ogonek_inset`.
+    from_stem = False
+    # Hook center, measured from the base's right edge as a fraction of its
+    # width (0 = flush with the right edge).
+    ogonek_inset = 0.0
+    ogonek_width = Ogonek.stem_ratio  # Start width, relative to stroke_x
+    ogonek_start = 0.0
+    stem_probe = 0.25  # Height where the stem is measured, relative to x-height
+
+    def _base_path(self, base, dc):
+        path = pathops.Path()
+        pen = pathops.PathPen(path)
+        base.draw_base(pen, dc) if hasattr(base, "draw_base") else base.draw(pen, dc)
+        return pathops.simplify(path)
+
+    def _rightmost_stem(self, path, dc):
+        """Horizontal span of the rightmost piece of the outline crossing a
+        thin band just above the baseline."""
+        y = self.stem_probe * dc.x_height
+        band = pathops.Path()
+        draw_rect(pathops.PathPen(band), -1000, y, 2000, y + 1)
+        section = pathops.op(path, band, pathops.PathOp.INTERSECTION)
+        pieces = []
+        for contour in section.contours:
+            xs = [x for _, points in contour for x, _ in points]
+            pieces.append((min(xs), max(xs)))
+        return max(pieces, key=lambda piece: piece[1])
+
+    def draw(self, pen, dc):
+        base_class = self._resolve_base_class(dc)
+        base = base_class()
+        base.draw_base(pen, dc) if hasattr(base, "draw_base") else base.draw(pen, dc)
+
+        path = self._base_path(base, dc)
+        start = self.ogonek_start * dc.x_height
+        if self.from_stem:
+            x1, x2 = self._rightmost_stem(path, dc)
+            Ogonek().draw_at(
+                pen,
+                dc,
+                x=(x1 + x2) / 2,
+                y=self.accent_y,
+                width=x2 - x1,
+                start=start,
+            )
+        else:
+            x1, _, x2, _ = path.bounds
+            width = self.ogonek_width * dc.stroke_x
+            x = x2 - self.ogonek_inset * (x2 - x1) - width / 2
+            Ogonek().draw_at(
+                pen, dc, x=x, y=self.accent_y, width=width, start=start
+            )
+
+
+class LowercaseAOgonekGlyph(OgonekComposedGlyph):
+    name = "lowercase_aogonek"
+    unicode = "0x105"
+    base_glyph_class = LowercaseAGlyph
+    from_stem = True
+
+
+class LowercaseEOgonekGlyph(OgonekComposedGlyph):
+    name = "lowercase_eogonek"
+    unicode = "0x119"
+    base_glyph_class = LowercaseEGlyph
+    ogonek_inset = 0.3
+
+
+class UppercaseAOgonekGlyph(OgonekComposedGlyph):
+    name = "uppercase_aogonek"
+    unicode = "0x104"
+    base_glyph_class = UppercaseAGlyph
+    ogonek_width = 0.85
+    ogonek_inset = 0.05
+
+
+class UppercaseEOgonekGlyph(OgonekComposedGlyph):
+    name = "uppercase_eogonek"
+    unicode = "0x118"
+    base_glyph_class = UppercaseEGlyph
+    ogonek_inset = 0.2
+
+
+# ── Polish: stroke ───────────────────────────────────────────────────
+
+
+class LowercaseLStrokeGlyph(ComposedGlyph):
+    name = "lowercase_lslash"
+    unicode = "0x142"
+    base_glyph_class = LowercaseLGlyph
+    accent_class = Stroke
+    accent_y = 0.55 * fc.ascent
+
+    def accent_x(self, dc, base, b):
+        return base.stem_center(dc)
+
+
+class UppercaseLStrokeGlyph(ComposedGlyph):
+    name = "uppercase_lslash"
+    unicode = "0x141"
+    base_glyph_class = UppercaseLGlyph
+    accent_class = UppercaseStroke
+    accent_y = 0.45 * fc.cap
+
+    def accent_x(self, dc, base, b):
+        return base.stem_center(dc)

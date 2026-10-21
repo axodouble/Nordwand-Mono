@@ -2,14 +2,14 @@ from glyphs import Glyph
 from draw.chevron import draw_chevron
 
 
-class GreaterThanSignGlyph(Glyph):
+class GreaterThenSignGlyph(Glyph):
     name = "greater_than_sign"
     unicode = "0x3E"
     offset = 0
     width_ratio = 1
     overlap = 0.6
     span = 0.50
-    stroke_ratio = 1.5
+    stroke_ratio = 1.2
 
     def draw(self, pen, dc):
         b = dc.body_bounds(
