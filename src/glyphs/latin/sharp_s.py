@@ -23,6 +23,7 @@ class SharpSGlyph(Glyph):
             offset=self.offset,
             height="cap",
             uppercase=True,
+            overshoot_top=True,
             width_ratio=self.width_ratio,
         )
         sx, sy = dc.stroke_x * self.stroke_x_ratio, dc.stroke_y * self.stroke_y_ratio
@@ -100,3 +101,9 @@ class SharpSGlyph(Glyph):
             (lower_x1 + lower_x2) / 2,
             b.y1 + sy,
         )
+
+
+class CapitalSharpSGlyph(SharpSGlyph):
+    name = "capital_sharp_s"
+    unicode = "0x1e9e"
+    tail_reach = 0
