@@ -1,20 +1,22 @@
 .PHONY: install build build-otf install-mac
 
+FONT_VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null || echo 1.0.0)
+
 install:
 	uv sync
 
 build:
-	uv run python -m generate_font --web-font
+	uv run python -m generate_font --font-version $(FONT_VERSION) --web-font
 	uv run python -m scripts.banner
 	uv run python -m scripts.specimen_pdf
 	uv run python -m scripts.samples
 	uv run python -m scripts.alternatives_markdown
 
 build-font:
-	uv run python -m generate_font --web-font
+	uv run python -m generate_font --font-version $(FONT_VERSION) --web-font
 
 build-otf:
-	uv run python -m generate_font --otf
+	uv run python -m generate_font --font-version $(FONT_VERSION) --otf
 
 install-mac:
 	cp -r fonts/otf/NordwandMono-*.otf ~/Library/Fonts

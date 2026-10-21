@@ -5,6 +5,7 @@ import importlib
 import inspect
 import math
 import pkgutil
+import re
 
 import pathops
 from fontTools.fontBuilder import FontBuilder
@@ -527,6 +528,17 @@ def _monospace_panose():
     return panose
 
 
+def font_revision(version):
+    """Map a `major.minor.patch` release to an OpenType revision: 1.3.2 -> 1.302."""
+    match = re.fullmatch(r"(\d+)\.(\d)\.(\d{1,2})", version)
+    if not match:
+        raise ValueError(
+            f"Version {version} must be MAJOR.MINOR.PATCH, MINOR < 10, PATCH < 100"
+        )
+    major, minor, patch = (int(part) for part in match.groups())
+    return major + (minor * 100 + patch) / 1000
+
+
 def _style_metadata(weight, italic):
     """Compute style name, PS name, name table entries, and OS/2 flags for a weight/italic combination."""
     if weight not in WEIGHT_NAMES:
@@ -556,7 +568,7 @@ def _style_metadata(weight, italic):
             "styleName": style_name,
             "uniqueFontIdentifier": ps_name,
             "fullName": full_name,
-            "version": "Version 1.000",
+            "version": f"Version {fc.font_revision:.3f}",
             "psName": ps_name,
         }
     else:
@@ -567,7 +579,7 @@ def _style_metadata(weight, italic):
             "styleName": legacy_sub,
             "uniqueFontIdentifier": ps_name,
             "fullName": full_name,
-            "version": "Version 1.000",
+            "version": f"Version {fc.font_revision:.3f}",
             "psName": ps_name,
             "typographicFamily": fc.family_name,
             "typographicSubfamily": style_name,
@@ -793,6 +805,7 @@ def _build_otf(
     timestamp = timestampNow()
     fb.setupHead(
         unitsPerEm=fc.units_per_em,
+        fontRevision=fc.font_revision,
         macStyle=mac_style,
         created=timestamp,
         modified=timestamp,
@@ -884,6 +897,7 @@ def build_ttf(
     timestamp = timestampNow()
     fb.setupHead(
         unitsPerEm=fc.units_per_em,
+        fontRevision=fc.font_revision,
         macStyle=mac_style,
         created=timestamp,
         modified=timestamp,
@@ -924,6 +938,11 @@ if __name__ == "__main__":
         metavar="FILE.yml",
         help="YAML file whose values overwrite the default FontConfig values",
     )
+    parser.add_argument(
+        "--font-version",
+        metavar="MAJOR.MINOR.PATCH",
+        help="Release version written to the name and head tables",
+    )
     args = parser.parse_args()
 
     out_root = "fonts"
@@ -937,6 +956,9 @@ if __name__ == "__main__":
         font_name = fc.family_name.replace(" ", "")
         out_root = f"custom-fonts/{font_name}"
         print(f"Writing custom fonts to ./{out_root}/")
+
+    if args.font_version:
+        fc.font_revision = font_revision(args.font_version)
 
     build_otf = not args.ttf
     build_ttf_flag = not args.otf
