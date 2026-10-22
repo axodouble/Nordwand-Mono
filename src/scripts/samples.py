@@ -174,14 +174,14 @@ int main() {
 SAMPLE_3 = """\
 module Fib where
 
-import Data.List (foldl\\')
+import Data.List (foldl')
 
 -- | Infinite list of Fibonacci numbers.
 fibs :: [Integer]
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
 
 fact :: Int -> Integer
-fact n = foldl\\' (*) 1 [1..fromIntegral n]
+fact n = foldl' (*) 1 [1..fromIntegral n]
 
 main :: IO ()
 main = do
