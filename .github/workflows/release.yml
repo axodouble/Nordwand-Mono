@@ -38,16 +38,12 @@ jobs:
       - name: Install fontforge
         run: sudo apt-get update && sudo apt-get install -y fontforge python3-fontforge
 
-      - name: Build Nerd Font
-        run: make build-nerd-font
-
       - name: Package fonts
         run: |
           zip -j NordwandMono-OTF.zip fonts/otf/*.otf
           zip -j NordwandMono-TTF.zip fonts/ttf/*.ttf
           zip -j NordwandMono-WOFF.zip fonts/woff/*.woff
           zip -j NordwandMono-WOFF2.zip fonts/woff2/*.woff2
-          (cd fonts/nerd-font && zip -r ../../NerdwandMono.zip .)
 
       - name: Upload release assets
         env:
