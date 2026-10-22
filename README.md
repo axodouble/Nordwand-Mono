@@ -30,11 +30,17 @@ The font includes minimal `->` and `=>` ligatures. Repeated `=`, `-`, `_`, and
 connect across runs of any length. These are off by default; enable the `dlig`
 feature to turn them on (see the [stylistic sets document](doc/stylistic_sets.md)).
 
+## Nerdwand Mono
+
+Nerdwand Mono is the [Nerd Font](https://www.nerdfonts.com) version of Nordwand Mono, patched with the complete set of icons. Icons are kept to a single cell, so the font stays strictly monospaced. It is not attached to releases; build it locally with `make build` then `make build-nerd-font`. This requires [uv](https://docs.astral.sh/uv/getting-started/installation/) and [fontforge](https://fontforge.org) (`brew install fontforge` on macOS, `fontforge python3-fontforge` on Debian and Ubuntu), and an internet connection on the first run to download the Nerd Fonts patcher. The patched fonts, with the font license and the licenses of the bundled icon sets, are generated inside `./fonts/nerd-font`.
+
 ## Compile your own custom version
 
 This font is generated with python. Each glyph is drawn from a python glyph class, in which you can inject a drawing context object. You can for example modify some metrics like the x-height, the capital height etc.
 
 To do so, override the config.example.yml with the values of your liking. Be sure to visualize the individual glyphs with `python -m visualize --config config.yml <glyph_id>`. Then you can geneate the full font with `python -m generate_font --config config.yml`. The font files will be generated inside `./custom-fonts`.
+
+For inspiration, browse the [`./configs`](configs) folder to see the font with other metrics configurations. Each subfolder contains a `config.yml` and a `sample.png` showing a code sample rendered with that configuration. To add your own, create `configs/<name>/config.yml` and run `python -m scripts.config_sample <name>`: it builds the regular weight of the font and writes the matching `configs/<name>/sample.png`.
 
 > [!WARNING]
 > There are no guarantees that the font might look good with different metrics, and some glyphs might require some tweaking if the metrics are altered !
