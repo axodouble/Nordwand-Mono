@@ -1,4 +1,4 @@
-.PHONY: install build build-otf install-mac
+.PHONY: install build build-otf build-nerd-font install-mac
 
 FONT_VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null || echo 1.0.0)
 
@@ -17,6 +17,9 @@ build-font:
 
 build-otf:
 	uv run python -m generate_font --font-version $(FONT_VERSION) --otf
+
+build-nerd-font:
+	uv run python -m scripts.nerd_font
 
 install-mac:
 	cp -r fonts/otf/NordwandMono-*.otf ~/Library/Fonts
