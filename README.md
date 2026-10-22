@@ -32,9 +32,7 @@ feature to turn them on (see the [stylistic sets document](doc/stylistic_sets.md
 
 ## Nerdwand Mono
 
-Nerdwand Mono is the [Nerd Font](https://www.nerdfonts.com) version of Nordwand Mono, patched with the complete set of icons. It is attached to each release as `NerdwandMono.zip`. Icons are kept to a single cell, so the font stays strictly monospaced. The archive includes the font license and the licenses of the bundled icon sets.
-
-To build it yourself, install [uv](https://docs.astral.sh/uv/getting-started/installation/) and [fontforge](https://fontforge.org) with its Python bindings (`python3-fontforge` on Debian and Ubuntu), then run `make install build-font build-nerd-font`. The patched fonts will be generated inside `./fonts/nerd-font`.
+Nerdwand Mono is the [Nerd Font](https://www.nerdfonts.com) version of Nordwand Mono, patched with the complete set of icons. Icons are kept to a single cell, so the font stays strictly monospaced. It is not attached to releases; build it locally with `make build` then `make build-nerd-font`. This requires [uv](https://docs.astral.sh/uv/getting-started/installation/) and [fontforge](https://fontforge.org) (`brew install fontforge` on macOS, `fontforge python3-fontforge` on Debian and Ubuntu), and an internet connection on the first run to download the Nerd Fonts patcher. The patched fonts, with the font license and the licenses of the bundled icon sets, are generated inside `./fonts/nerd-font`.
 
 ## Compile your own custom version
 
