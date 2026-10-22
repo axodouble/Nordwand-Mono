@@ -5,7 +5,7 @@ from draw.arch import draw_arch
 
 class UppercaseOeGlyph(UppercaseGlyph):
     name = "uppercase_oe"
-    unicode = "0x153"
+    unicode = "0x152"
     offset = 0
     bar_height = 0.35
     overlap = 0.25
@@ -17,7 +17,11 @@ class UppercaseOeGlyph(UppercaseGlyph):
 
     def draw(self, pen, dc):
         b = dc.body_bounds(
-            offset=self.offset, height="cap", width_ratio=self.width_ratio
+            offset=self.offset,
+            height="cap",
+            width_ratio=self.width_ratio,
+            overshoot_top=True,
+            overshoot_bottom=True,
         )
         sx, sy = dc.stroke_x * self.stroke_x_ratio, dc.stroke_y * self.stroke_y_ratio
 
@@ -36,13 +40,13 @@ class UppercaseOeGlyph(UppercaseGlyph):
             b.hy,
         )
 
-        draw_rect(pen, xmid - sx / 2, b.y1, xmid + sx / 2, b.y2)
+        draw_rect(pen, xmid - sx / 2, b.y1, xmid + sx / 2, dc.cap)
 
         # Vertical stem
         draw_rect(pen, xmid, ymid - sy / 2, b.x2, ymid + sy / 2)
 
         # Top bar
-        draw_rect(pen, xmid, b.y2 - sy, b.x2, b.y2)
+        draw_rect(pen, xmid, dc.cap - sy, b.x2, dc.cap)
 
         # Middle bar
         draw_rect(
