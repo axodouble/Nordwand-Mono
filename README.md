@@ -40,6 +40,8 @@ This font is generated with python. Each glyph is drawn from a python glyph clas
 
 To do so, override the config.example.yml with the values of your liking. Be sure to visualize the individual glyphs with `python -m visualize --config config.yml <glyph_id>`. Then you can geneate the full font with `python -m generate_font --config config.yml`. The font files will be generated inside `./custom-fonts`.
 
+For inspiration, browse the [`./configs`](configs) folder to see the font with other metrics configurations. Each subfolder contains a `config.yml` and a `sample.png` showing a code sample rendered with that configuration. To add your own, create `configs/<name>/config.yml` and run `python -m scripts.config_sample <name>`: it builds the regular weight of the font and writes the matching `configs/<name>/sample.png`.
+
 > [!WARNING]
 > There are no guarantees that the font might look good with different metrics, and some glyphs might require some tweaking if the metrics are altered !
 
