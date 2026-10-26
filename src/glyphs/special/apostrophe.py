@@ -1,4 +1,5 @@
 from glyphs import Glyph
+from glyphs.special.quotation_mark import QuotationMarkGlyph
 from draw.rect import draw_rect
 
 
@@ -7,7 +8,7 @@ class ApostropheMarkGlyph(Glyph):
     unicode = "0x27"
     offset = 0
     width_ratio = 1
-    height_ratio = 0.7
+    height_ratio = QuotationMarkGlyph.height_ratio
 
     def draw(self, pen, dc):
         b = dc.body_bounds(
