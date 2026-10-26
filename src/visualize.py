@@ -14,7 +14,7 @@ from fontTools.misc.transform import Transform
 
 sys.path.insert(0, "src")
 from config import FontConfig as fc
-from config import DrawConfig
+from config import DrawConfig, WEIGHT_NAMES, weight_name
 from glyphs import InfiniteLigatureForm, LigatureGlyph
 from generate_font import discover_glyphs, select_style_glyphs, skew_path
 
@@ -555,15 +555,8 @@ if __name__ == "__main__":
         applied = load_config(args.config)
         print(f"Loaded config overrides from {args.config}: {applied}")
 
-    WEIGHT_ALIASES = {
-        "thin": 100,
-        "extralight": 200,
-        "light": 300,
-        "regular": 400,
-        "medium": 500,
-        "semibold": 600,
-        "bold": 700,
-    }
+    WEIGHT_ALIASES = {name.lower(): w for w, name in WEIGHT_NAMES.items()}
+    WEIGHT_ALIASES.update({weight_name(w).lower(): w for w in fc.weights})
 
     italic = False
     configs, labels = [], []

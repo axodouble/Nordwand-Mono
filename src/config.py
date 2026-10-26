@@ -151,6 +151,21 @@ class DrawConfig(FontConfig):
         )
 
     @classmethod
+    def for_weight(cls, w=400, italic=False):
+        """Return the DrawConfig of weight `w`, with its config stroke overrides."""
+        if w != 400:
+            dc = cls.weight(w=w)
+        elif italic:
+            dc = cls.for_italic()
+        else:
+            dc = cls()
+        for key, value in FontConfig.weights.get(w, {}).items():
+            if key != "name":
+                setattr(dc, key, value)
+        dc.italic = italic
+        return dc
+
+    @classmethod
     def for_italic(cls):
         return cls(
             stroke_x=int(cls.stroke_x),
@@ -231,9 +246,37 @@ class DrawConfig(FontConfig):
 def config_keys():
     """Names of all overridable configuration values."""
     keys = {f.name for f in dataclasses.fields(DrawConfig)}
-    # `default_stroke` is a plain class attribute (no annotation), not a field.
-    keys.add("default_stroke")
+    # `default_stroke` and `weights` are plain class attributes, not fields.
+    keys.update({"default_stroke", "weights"})
     return keys
+
+
+def parse_weights(value):
+    """Normalise the `weights` config value to {weight: {key: value}}.
+
+    Accepts a list of weights (`[400, 425, 700]`) or a mapping of weight to
+    its settings (`{425: {name: Book, stroke_y: 84}}`, `{700: null}`).
+    """
+    if isinstance(value, list):
+        value = {w: {} for w in value}
+    if not isinstance(value, dict) or not value:
+        raise ValueError("`weights` must be a non-empty list or mapping of weights")
+
+    weights = {}
+    for w, settings in value.items():
+        if not isinstance(w, int) or not 1 <= w <= 1000:
+            raise ValueError(f"Weight {w!r} must be an integer from 1 to 1000")
+        settings = settings or {}
+        unknown = set(settings) - WEIGHT_KEYS
+        if unknown:
+            raise ValueError(
+                f"Unknown keys for weight {w}: {sorted(unknown)}. "
+                f"Valid keys: {sorted(WEIGHT_KEYS)}"
+            )
+        if "name" not in settings and w not in WEIGHT_NAMES:
+            raise ValueError(f"Weight {w} needs a `name` in the config")
+        weights[w] = dict(settings)
+    return dict(sorted(weights.items()))
 
 
 def apply_config_overrides(overrides):
@@ -253,6 +296,9 @@ def apply_config_overrides(overrides):
         raise ValueError(
             f"Unknown config keys: {sorted(unknown)}. Valid keys: {sorted(valid)}"
         )
+
+    if "weights" in overrides:
+        overrides = {**overrides, "weights": parse_weights(overrides["weights"])}
 
     for key, value in overrides.items():
         for cls in (FontConfig, DrawConfig):
