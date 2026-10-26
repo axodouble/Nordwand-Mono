@@ -21,6 +21,9 @@ from glyphs.lowercase.s import LowercaseSGlyph
 from glyphs.lowercase.single_story.g import LowercaseGGlyph
 from glyphs.lowercase.l import LowercaseLGlyph
 from glyphs.lowercase.z import LowercaseZGlyph
+from glyphs.lowercase.t import LowercaseTGlyph
+from glyphs.lowercase.k import LowercaseKGlyph
+from glyphs.lowercase.r import LowercaseRGlyph
 
 from glyphs.uppercase.a import UppercaseAGlyph
 from glyphs.uppercase.e import UppercaseEGlyph
@@ -34,6 +37,9 @@ from glyphs.uppercase.s import UppercaseSGlyph
 from glyphs.uppercase.g import UppercaseGGlyph
 from glyphs.uppercase.l import UppercaseLGlyph
 from glyphs.uppercase.z import UppercaseZGlyph
+from glyphs.uppercase.t import UppercaseTGlyph
+from glyphs.uppercase.k import UppercaseKGlyph
+from glyphs.uppercase.r import UppercaseRGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -48,6 +54,7 @@ from glyphs.accents.breve import Breve
 from glyphs.accents.dot import DotAbove
 from glyphs.accents.ogonek import Ogonek
 from glyphs.accents.stroke import Stroke, UppercaseStroke
+from glyphs.accents.comma_below import CommaBelow
 import pathops
 from draw.rect import draw_rect
 
@@ -901,3 +908,161 @@ class UppercaseLStrokeGlyph(ComposedGlyph):
 
     def accent_x(self, dc, base, b):
         return base.stem_center(dc)
+
+
+# ── Romanian: breve ──────────────────────────────────────────────────
+
+
+class LowercaseABreveGlyph(ComposedGlyph):
+    name = "lowercase_abreve"
+    unicode = "0x103"
+    base_glyph_class = LowercaseAGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+class UppercaseABreveGlyph(ComposedGlyph):
+    name = "uppercase_abreve"
+    unicode = "0x102"
+    base_glyph_class = UppercaseAGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
+
+
+# ── Romanian: comma below ────────────────────────────────────────────
+
+
+class LowercaseSCommaGlyph(ComposedGlyph):
+    name = "lowercase_scommaaccent"
+    unicode = "0x219"
+    base_glyph_class = LowercaseSGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class LowercaseTCommaGlyph(ComposedGlyph):
+    name = "lowercase_tcommaaccent"
+    unicode = "0x21B"
+    base_glyph_class = LowercaseTGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseSCommaGlyph(ComposedGlyph):
+    name = "uppercase_scommaaccent"
+    unicode = "0x218"
+    base_glyph_class = UppercaseSGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseTCommaGlyph(ComposedGlyph):
+    name = "uppercase_tcommaaccent"
+    unicode = "0x21A"
+    base_glyph_class = UppercaseTGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+# ── Romanian (legacy): t with cedilla ────────────────────────────────
+
+
+class LowercaseTCedillaGlyph(ComposedGlyph):
+    name = "lowercase_tcedilla"
+    unicode = "0x163"
+    base_glyph_class = LowercaseTGlyph
+    accent_class = Cedilla
+    accent_y = _cedilla_y
+
+
+class UppercaseTCedillaGlyph(ComposedGlyph):
+    name = "uppercase_tcedilla"
+    unicode = "0x162"
+    base_glyph_class = UppercaseTGlyph
+    accent_class = Cedilla
+    accent_y = _cedilla_y
+
+
+# ── Latvian: comma below (Unicode names them "cedilla") ──────────────
+
+
+class LowercaseGCommaGlyph(ComposedGlyph):
+    """The descender leaves no room below, so ģ takes its comma above."""
+
+    name = "lowercase_gcommaaccent"
+    unicode = "0x123"
+    base_glyph_class = LowercaseGGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class LowercaseKCommaGlyph(ComposedGlyph):
+    name = "lowercase_kcommaaccent"
+    unicode = "0x137"
+    base_glyph_class = LowercaseKGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class LowercaseLCommaGlyph(ComposedGlyph):
+    name = "lowercase_lcommaaccent"
+    unicode = "0x13C"
+    base_glyph_class = LowercaseLGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class LowercaseNCommaGlyph(ComposedGlyph):
+    name = "lowercase_ncommaaccent"
+    unicode = "0x146"
+    base_glyph_class = LowercaseNGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class LowercaseRCommaGlyph(ComposedGlyph):
+    name = "lowercase_rcommaaccent"
+    unicode = "0x157"
+    base_glyph_class = LowercaseRGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseGCommaGlyph(ComposedGlyph):
+    name = "uppercase_gcommaaccent"
+    unicode = "0x122"
+    base_glyph_class = UppercaseGGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseKCommaGlyph(ComposedGlyph):
+    name = "uppercase_kcommaaccent"
+    unicode = "0x136"
+    base_glyph_class = UppercaseKGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseLCommaGlyph(ComposedGlyph):
+    name = "uppercase_lcommaaccent"
+    unicode = "0x13B"
+    base_glyph_class = UppercaseLGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseNCommaGlyph(ComposedGlyph):
+    name = "uppercase_ncommaaccent"
+    unicode = "0x145"
+    base_glyph_class = UppercaseNGlyph
+    accent_class = CommaBelow
+    accent_y = 0
+
+
+class UppercaseRCommaGlyph(ComposedGlyph):
+    name = "uppercase_rcommaaccent"
+    unicode = "0x156"
+    base_glyph_class = UppercaseRGlyph
+    accent_class = CommaBelow
+    accent_y = 0
