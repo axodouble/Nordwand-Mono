@@ -49,22 +49,22 @@ if features.check_feature("raqm"):
 
 # Gravity palette (~/.config/colorthemes/monochrome/gravity.yaml)
 BG = "#121212"
-FG = "#cccccc"
-FG_BRIGHT = "#eeeeee"
-PRIMARY = "#91c7d9"
+FG = "#dadada"
+FG_BRIGHT = "#f2f2f2"
+PRIMARY = "#a0d6e8"
 PRIMARY_BRIGHT = "#abeaff"
 CONTRAST = "#af875f"
 CONTRAST_BRIGHT = "#d7af87"
 
 # 10-step monochrome gradient from foreground (noir_0) toward background (noir_9),
 # mirroring the noir_N scale used in ~/.config/nvim/lua/noir.lua.
-NOIR_0 = "#cccccc"
-NOIR_1 = "#b3b3b3"
-NOIR_2 = "#9a9a9a"
-NOIR_3 = "#808080"
-NOIR_4 = "#707070"
-NOIR_5 = "#606060"
-NOIR_6 = "#505050"
+NOIR_0 = "#dadada"
+NOIR_1 = "#c4c4c4"
+NOIR_2 = "#acacac"
+NOIR_3 = "#959595"
+NOIR_4 = "#868686"
+NOIR_5 = "#787878"
+NOIR_6 = "#6a6a6a"
 NOIR_7 = "#424242"
 NOIR_8 = "#2c2c2c"
 NOIR_9 = "#1f1f1f"
