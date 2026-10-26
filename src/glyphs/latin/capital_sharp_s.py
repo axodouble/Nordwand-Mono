@@ -5,17 +5,16 @@ from draw.parallelogramm import draw_parallelogramm
 from draw.corner import draw_corner
 
 
-class SharpS2Glyph(Glyph):
-    name = "sharp_s_2"
-    unicode = "0xdf"
-    font_feature = {"cv20": 1}
+class CapitalSharpSGlyph(Glyph):
+    name = "capital_sharp_s"
+    unicode = "0x1e9e"
     offset = 12
     upper_ratio = 0.9  # Upper loop width as a fraction of the lower loop width
     mid_ratio = 0.52
     width_ratio = 1.06
     offset_lower_bar = 0.3
     reach_upper_bar = 0.9
-    tail_reach = 0.15
+    tail_reach = 0.0
     stroke_x_ratio = 1.00
     stroke_y_ratio = 1.00
 
@@ -109,10 +108,3 @@ class SharpS2Glyph(Glyph):
             (lower_x1 + lower_x2) / 2,
             b.y1 + sy,
         )
-
-
-class CapitalSharpSGlyph(SharpS2Glyph):
-    name = "capital_sharp_s_2"
-    font_feature = {"cv20": 1}
-    unicode = "0x1e9e"
-    tail_reach = 0
