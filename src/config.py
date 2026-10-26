@@ -83,6 +83,7 @@ def weight_name(w):
         raise ValueError(f"Weight {w} needs a `name` in the config")
     return name
 
+
 @dataclass
 class DrawConfig(FontConfig):
     # Can be overwritten for bold / thinner fonts
@@ -121,7 +122,7 @@ class DrawConfig(FontConfig):
         ratio_y = [0.667, 0.763, 0.874, 0.967, 1, 1.034, 1.145, 1.31, 1.5]
         ratio_alt = [0.833, 0.886, 0.941, 0.985, 1, 1.015, 1.063, 1.129, 1.2]
         ratio_hx = [0.909, 0.938, 0.969, 0.992, 1, 1.008, 1.032, 1.066, 1.1]
-        ratio_hy = [0.909, 0.938, 0.969, 0.992, 1, 1.008, 1.032, 1.066, 1.1]
+        ratio_hy = [1.0, 1.0, 1.0, 1.0, 1, 1.0, 1.0, 1.0, 1.0]
         # Absolute values
         tapers = [0.5, 0.5, 0.5, 0.5, 0.5, 0.479, 0.415, 0.33, 0.245]
 
