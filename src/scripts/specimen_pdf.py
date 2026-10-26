@@ -55,104 +55,12 @@ FAMILY_VARIANTS = [
 ]
 
 
-TITLE_FONT = "U001"
-TITLE_FONT_REGULAR = "U001"
+# Standard PDF fonts: built into reportlab and every PDF viewer, no file needed.
+TITLE_FONT = "Helvetica-Bold"
+TITLE_FONT_REGULAR = "Helvetica"
 
 # Sentinel: when found in the samples list, force a new page before the next sample.
 SAMPLE_SEP = object()
-
-
-def _find_system_font(filename):
-    """Locate a font file by basename in the standard macOS, Linux and Windows font directories."""
-    import os
-
-    dirs = [
-        os.path.expanduser("~/Library/Fonts"),
-        "/Library/Fonts",
-        "/System/Library/Fonts",
-        "/System/Library/Fonts/Supplemental",
-        os.path.expanduser("~/.local/share/fonts"),
-        os.path.expanduser("~/.fonts"),
-        "/usr/local/share/fonts",
-        "/usr/share/fonts",
-        os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts"),
-        os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "Windows", "Fonts"),
-    ]
-    for d in dirs:
-        # fonts may not be in the root folder so recurse
-        for root, _, files in os.walk(d):
-            if filename in files:
-                return os.path.join(root, filename)
-    raise FileNotFoundError(f"Font '{filename}' not found in system font directories")
-
-
-def _otf_to_ttf(otf_path):
-    """Convert an OTF (CFF outlines) to a temp TTF (glyf outlines) for reportlab."""
-    import tempfile
-    from fontTools.ttLib import TTFont as FTTTFont, newTable
-    from fontTools.pens.cu2quPen import Cu2QuPen
-    from fontTools.pens.ttGlyphPen import TTGlyphPen
-
-    font = FTTTFont(otf_path)
-    if "glyf" in font:
-        return otf_path  # already TTF
-
-    glyph_set = font.getGlyphSet()
-    glyph_order = font.getGlyphOrder()
-
-    glyf_data = {}
-    for name in glyph_order:
-        ttf_pen = TTGlyphPen(None)
-        cu2qu_pen = Cu2QuPen(ttf_pen, max_err=1.0, reverse_direction=True)
-        glyph_set[name].draw(cu2qu_pen)
-        glyf_data[name] = ttf_pen.glyph()
-
-    for tag in ("CFF ", "CFF2"):
-        if tag in font:
-            del font[tag]
-
-    glyf = newTable("glyf")
-    glyf.glyphs = glyf_data
-    glyf.glyphOrder = glyph_order
-    font["glyf"] = glyf
-    font["loca"] = newTable("loca")
-
-    font.sfntVersion = "\x00\x01\x00\x00"
-    font["head"].indexToLocFormat = 0
-
-    maxp = font["maxp"]
-    maxp.tableVersion = 0x00010000
-    for attr, default in (
-        ("maxZones", 1),
-        ("maxTwilightPoints", 0),
-        ("maxStorage", 0),
-        ("maxFunctionDefs", 0),
-        ("maxInstructionDefs", 0),
-        ("maxStackElements", 0),
-        ("maxSizeOfInstructions", 0),
-        ("maxComponentElements", 0),
-        ("maxComponentDepth", 0),
-    ):
-        if not hasattr(maxp, attr):
-            setattr(maxp, attr, default)
-
-    tmp = tempfile.NamedTemporaryFile(suffix=".ttf", delete=False)
-    tmp.close()
-    font.save(tmp.name)
-    return tmp.name
-
-
-def _register_system_otf(reportlab_name, filename, fallback):
-    """Register a system font, falling back to a built-in font if it is missing."""
-    try:
-        path = _find_system_font(filename)
-    except FileNotFoundError as e:
-        print(f"Warning: {e}; using {fallback} instead")
-        pdfmetrics.registerFont(
-            pdfmetrics.Font(reportlab_name, fallback, "WinAnsiEncoding")
-        )
-        return
-    pdfmetrics.registerFont(TTFont(reportlab_name, _otf_to_ttf(path)))
 
 
 def _draw_unicode_inventory(c, font_path, page_w, page_h):
@@ -215,10 +123,8 @@ def _draw_unicode_inventory(c, font_path, page_w, page_h):
 def render_specimen(font_path, output="specimen.pdf"):
     import os
 
-    os.makedirs(os.path.dirname(output), exist_ok=True)
+    os.makedirs(os.path.dirname(output) or ".", exist_ok=True)
     pdfmetrics.registerFont(TTFont("Nordwand Mono", font_path))
-    _register_system_otf(TITLE_FONT, "Switzer-Bold.otf", "Helvetica-Bold")
-    _register_system_otf(TITLE_FONT_REGULAR, "Switzer-Regular.otf", "Helvetica")
 
     # Register every available family variant for the overview page
     font_dir = os.path.dirname(font_path)
@@ -430,7 +336,7 @@ def render_specimen(font_path, output="specimen.pdf"):
         c.line(MARGIN_X, y, page_w - MARGIN_X, y)
         y -= LABEL_SIZE + 4
 
-        # Label: family name in Switzer Bold, size in Switzer Regular
+        # Label: family name in bold, size in regular
         c.setFillColorRGB(*FG)
         c.setFont(TITLE_FONT, LABEL_SIZE)
         c.drawString(MARGIN_X, y, family_label)
