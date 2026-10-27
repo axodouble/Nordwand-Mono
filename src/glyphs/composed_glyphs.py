@@ -1338,6 +1338,7 @@ class OgonekComposedGlyph(ComposedGlyph):
     ogonek_width = Ogonek.stem_ratio  # Start width, relative to stroke_x
     ogonek_start = 0.0
     stem_probe = 0.25  # Height where the stem is measured, relative to x-height
+    keep_dot = False  # Draw the full base (e.g. the dot of į) instead of draw_base
 
     def _base_path(self, base, dc):
         path = pathops.Path()
@@ -1361,7 +1362,10 @@ class OgonekComposedGlyph(ComposedGlyph):
     def draw(self, pen, dc):
         base_class = self._resolve_base_class(dc)
         base = base_class()
-        base.draw_base(pen, dc) if hasattr(base, "draw_base") else base.draw(pen, dc)
+        if self.keep_dot or not hasattr(base, "draw_base"):
+            base.draw(pen, dc)
+        else:
+            base.draw_base(pen, dc)
 
         path = self._base_path(base, dc)
         start = self.ogonek_start * dc.x_height
@@ -1592,3 +1596,51 @@ class UppercaseRCommaGlyph(ComposedGlyph):
     base_glyph_class = UppercaseRGlyph
     accent_class = CommaBelow
     accent_y = 0
+
+
+# ── Lithuanian: dot above and ogonek ─────────────────────────────────
+
+
+class LowercaseEDotGlyph(ComposedGlyph):
+    name = "lowercase_edotaccent"
+    unicode = "0x117"
+    base_glyph_class = LowercaseEGlyph
+    accent_class = DotAbove
+    accent_y = _lc_accent
+
+
+class UppercaseEDotGlyph(ComposedGlyph):
+    name = "uppercase_edotaccent"
+    unicode = "0x116"
+    base_glyph_class = UppercaseEGlyph
+    accent_class = DotAbove
+    accent_y = _uc_accent
+
+
+class LowercaseIOgonekGlyph(OgonekComposedGlyph):
+    name = "lowercase_iogonek"
+    unicode = "0x12F"
+    base_glyph_class = LowercaseIGlyph
+    keep_dot = True
+    from_stem = True
+
+
+class UppercaseIOgonekGlyph(OgonekComposedGlyph):
+    name = "uppercase_iogonek"
+    unicode = "0x12E"
+    base_glyph_class = UppercaseIGlyph
+    from_stem = True
+
+
+class LowercaseUOgonekGlyph(OgonekComposedGlyph):
+    name = "lowercase_uogonek"
+    unicode = "0x173"
+    base_glyph_class = LowercaseUGlyph
+    from_stem = True
+
+
+class UppercaseUOgonekGlyph(OgonekComposedGlyph):
+    name = "uppercase_uogonek"
+    unicode = "0x172"
+    base_glyph_class = UppercaseUGlyph
+    ogonek_inset = 0.3
