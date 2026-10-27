@@ -21,6 +21,7 @@ class Glyph(ABC):
     alternative_character_comment: str = None
     default_italic: bool = False
     italic_only: bool = False
+    italic_skew: bool = True
 
     @abstractmethod
     def draw(self, pen, dc) -> None: ...

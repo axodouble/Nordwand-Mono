@@ -711,7 +711,7 @@ def _build_otf(
     }
     for g in active_glyphs:
         path = simplify_glyph(g, dc=dc)
-        if italic:
+        if italic and g.italic_skew:
             path = skew_path(path, fc.italic_angle)
         pen = T2CharStringPen(fc.window_width, None)
         path.draw(pen)
@@ -820,7 +820,7 @@ def build_ttf(
 
     def record_ttf_glyph(glyph):
         path = simplify_glyph(glyph, dc=dc)
-        if italic:
+        if italic and glyph.italic_skew:
             path = skew_path(path, fc.italic_angle)
         ttf_pen = TTGlyphPen(None)
         cu2qu_pen = Cu2QuPen(ttf_pen, max_err=1.0, reverse_direction=True)

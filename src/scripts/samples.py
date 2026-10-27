@@ -15,7 +15,6 @@ from pygments.formatters import ImageFormatter
 from pygments.lexers import (
     CppLexer,
     HaskellLexer,
-    MarkdownLexer,
     PythonLexer,
     TextLexer,
 )
@@ -126,11 +125,8 @@ abcdefghijklmnopqrstuvwxyz
 
 !"#$%&'()+=,-./:;<*>
 ?@[\\]^_`{|}~
--> => __ -- == →
 
-oO08 iIlL1 g9qCGQ 8%& <([{}])> .,;: ~-_=
-
-â é ù ï ø ç Ã Ē Æ œ
+oO08 iIlL1 g9qCGQ 38&% <([{}])> .,;: ~-_=
 
 The quick brown fox jumps over the lazy dog
 """
