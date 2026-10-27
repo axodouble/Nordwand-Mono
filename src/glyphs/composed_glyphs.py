@@ -68,6 +68,7 @@ from glyphs.accents.stroke import Stroke, UppercaseStroke
 from glyphs.accents.comma_below import CommaBelow
 import pathops
 from draw.rect import draw_rect
+from draw.square_corner import draw_square_corner
 
 # Heights for accent positioning
 _lc_accent = fc.accent
@@ -1638,7 +1639,7 @@ class LowercaseUOgonekGlyph(OgonekComposedGlyph):
     name = "lowercase_uogonek"
     unicode = "0x173"
     base_glyph_class = LowercaseUGlyph
-    from_stem = True
+    ogonek_inset = 0.32
 
 
 class UppercaseUOgonekGlyph(OgonekComposedGlyph):
@@ -1684,13 +1685,19 @@ class UppercaseGCircumflexGlyph(ComposedGlyph):
 
 
 class LowercaseHCircumflexGlyph(ComposedGlyph):
-    """h with the circumflex above its ascender, centered on the glyph."""
+    """h with the circumflex above its ascender, centered on the left stem."""
 
     name = "lowercase_hcircumflex"
     unicode = "0x125"
     base_glyph_class = LowercaseHGlyph
     accent_class = Circumflex
     accent_y = LowercaseLAcuteGlyph.accent_y
+
+    def accent_x(self, dc, base, b):
+        b = dc.body_bounds(
+            width_ratio=base.width_ratio, offset=base.offset, overshoot_top=True
+        )
+        return b.x1 + dc.stroke_x / 2
 
 
 class UppercaseHCircumflexGlyph(ComposedGlyph):
@@ -1708,6 +1715,12 @@ class LowercaseJCircumflexGlyph(ComposedGlyph):
     accent_class = Circumflex
     accent_y = _lc_accent
 
+    def accent_x(self, dc, base, b):
+        b = dc.body_bounds(
+            width_ratio=base.width_ratio, offset=base.offset, overshoot_top=True
+        )
+        return b.xmid
+
 
 class UppercaseJCircumflexGlyph(ComposedGlyph):
     name = "uppercase_jcircumflex"
@@ -1715,6 +1728,12 @@ class UppercaseJCircumflexGlyph(ComposedGlyph):
     base_glyph_class = UppercaseJGlyph
     accent_class = Circumflex
     accent_y = _uc_accent
+
+    def accent_x(self, dc, base, b):
+        b = dc.body_bounds(
+            width_ratio=base.width_ratio, offset=base.offset, overshoot_top=True
+        )
+        return (b.x1 + b.x2) * 0.57
 
 
 class LowercaseSCircumflexGlyph(ComposedGlyph):
@@ -1747,3 +1766,107 @@ class UppercaseUBreveGlyph(ComposedGlyph):
     base_glyph_class = UppercaseUGlyph
     accent_class = Breve
     accent_y = _uc_accent
+
+
+# ── Sámi: eng ────────────────────────────────────────────────────────
+
+
+class EngComposedGlyph(ComposedGlyph):
+    """n/N whose right stem continues into a hook curving left below the
+    baseline."""
+
+    hook_end = 0.35  # Where the hook ends, as a fraction of the body width
+
+    def body(self, base, dc): ...
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        base.draw(pen, dc)
+        b, sx, sy = self.body(base, dc)
+        draw_square_corner(
+            pen,
+            sx,
+            sy,
+            b.x2,
+            0,
+            b.x1 + self.hook_end * b.width,
+            dc.descent,
+            orientation="bottom-left",
+        )
+
+
+class LowercaseEngGlyph(EngComposedGlyph):
+    name = "lowercase_eng"
+    unicode = "0x14B"
+    base_glyph_class = LowercaseNGlyph
+
+    def body(self, base, dc):
+        b = dc.body_bounds(
+            offset=base.offset, overshoot_top=True, width_ratio=base.width_ratio
+        )
+        return b, dc.stroke_x, dc.stroke_y
+
+
+class UppercaseEngGlyph(EngComposedGlyph):
+    name = "uppercase_eng"
+    unicode = "0x14A"
+    base_glyph_class = UppercaseNGlyph
+
+    def body(self, base, dc):
+        b = dc.body_bounds(
+            offset=base.offset,
+            height="cap",
+            width_ratio=base.width_ratio,
+            uppercase=True,
+            min_margin=dc.min_margin_uppercase,
+        )
+        return b, dc.stroke_x * base.stroke_x_ratio, dc.stroke_y * base.stroke_y_ratio
+
+
+# ── Sámi: t with stroke ──────────────────────────────────────────────
+
+
+class TStrokeComposedGlyph(ComposedGlyph):
+    """t/T with a horizontal bar crossing the stem."""
+
+    bar_y = 0.5  # Bar center, relative to the body height
+    bar_half = 0.4  # Reach on each side of the stem center, relative to body width
+
+    def body(self, base, dc): ...
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        base.draw(pen, dc)
+        b, sy = self.body(base, dc)
+        y = self.bar_y * b.height
+        h = self.bar_half * b.width
+        draw_rect(pen, b.xmid - h, y - sy / 2, b.xmid + h, y + sy / 2)
+
+
+class LowercaseTStrokeGlyph(TStrokeComposedGlyph):
+    name = "lowercase_tbar"
+    unicode = "0x167"
+    base_glyph_class = LowercaseTGlyph
+    # Between the bottom curve (which starts at mid x-height) and the crossbar
+    bar_y = 0.56
+
+    def body(self, base, dc):
+        b = dc.body_bounds(
+            offset=base.offset, height="x_height", width_ratio=base.width_ratio
+        )
+        return b, dc.stroke_y
+
+
+class UppercaseTStrokeGlyph(TStrokeComposedGlyph):
+    name = "uppercase_tbar"
+    unicode = "0x166"
+    base_glyph_class = UppercaseTGlyph
+
+    def body(self, base, dc):
+        b = dc.body_bounds(
+            offset=base.offset,
+            height="cap",
+            width_ratio=base.width_ratio,
+            min_margin=dc.min_margin_uppercase,
+        )
+        return b, dc.stroke_y * base.stroke_y_ratio
