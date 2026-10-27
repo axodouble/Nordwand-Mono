@@ -47,6 +47,8 @@ from glyphs.lowercase.square.h import LowercaseHGlyph
 from glyphs.uppercase.d import UppercaseDGlyph
 from glyphs.lowercase.single_story.d import LowercaseDGlyph
 from glyphs.latin.uppercase.eth import UppercaseEthGlyph
+from glyphs.lowercase.dotted.j import LowercaseJGlyph
+from glyphs.uppercase.j import UppercaseJGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -428,7 +430,7 @@ class LowercaseLDotGlyph(LowercaseLGlyph):
         b = dc.body_bounds(
             offset=self.offset, height="ascent", width_ratio=self.width_ratio
         )
-        _draw_l_dot(pen, dc, b.x2, dc.x_height / 2)
+        _draw_l_dot(pen, dc, b.x2, dc.cap / 2)
 
 
 class UppercaseLDotGlyph(UppercaseLGlyph):
@@ -1644,3 +1646,104 @@ class UppercaseUOgonekGlyph(OgonekComposedGlyph):
     unicode = "0x172"
     base_glyph_class = UppercaseUGlyph
     ogonek_inset = 0.3
+
+
+# ── Esperanto: circumflex and breve ──────────────────────────────────
+
+
+class LowercaseCCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_ccircumflex"
+    unicode = "0x109"
+    base_glyph_class = LowercaseCGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseCCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_ccircumflex"
+    unicode = "0x108"
+    base_glyph_class = UppercaseCGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseGCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_gcircumflex"
+    unicode = "0x11D"
+    base_glyph_class = LowercaseGGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseGCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_gcircumflex"
+    unicode = "0x11C"
+    base_glyph_class = UppercaseGGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseHCircumflexGlyph(ComposedGlyph):
+    """h with the circumflex above its ascender, centered on the glyph."""
+
+    name = "lowercase_hcircumflex"
+    unicode = "0x125"
+    base_glyph_class = LowercaseHGlyph
+    accent_class = Circumflex
+    accent_y = LowercaseLAcuteGlyph.accent_y
+
+
+class UppercaseHCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_hcircumflex"
+    unicode = "0x124"
+    base_glyph_class = UppercaseHGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseJCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_jcircumflex"
+    unicode = "0x135"
+    base_glyph_class = LowercaseJGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseJCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_jcircumflex"
+    unicode = "0x134"
+    base_glyph_class = UppercaseJGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseSCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_scircumflex"
+    unicode = "0x15D"
+    base_glyph_class = LowercaseSGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseSCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_scircumflex"
+    unicode = "0x15C"
+    base_glyph_class = UppercaseSGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseUBreveGlyph(ComposedGlyph):
+    name = "lowercase_ubreve"
+    unicode = "0x16D"
+    base_glyph_class = LowercaseUGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+class UppercaseUBreveGlyph(ComposedGlyph):
+    name = "uppercase_ubreve"
+    unicode = "0x16C"
+    base_glyph_class = UppercaseUGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
