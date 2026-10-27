@@ -645,6 +645,9 @@ def build_font(
             cmap[int(g.unicode, 16)] = g.name
         if isinstance(g, (LigatureGlyph, InfiniteLigatureForm)):
             ligature_glyphs.append(g)
+    # No-break space and soft hyphen share the space and hyphen glyphs
+    cmap[0xA0] = "space"
+    cmap[0xAD] = cmap[0x2D]
 
     if otf:
         _build_otf(
