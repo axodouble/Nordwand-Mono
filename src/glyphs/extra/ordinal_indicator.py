@@ -22,22 +22,33 @@ class OrdinalIndicatorGlyph(Glyph):
     top_ratio = 1  # Top of the character, relative to the cap height
 
     def draw(self, pen, dc):
-        k = self.stroke_ratio / self.scale
-        heavy = dataclasses.replace(
+        draw_scaled(
+            pen,
             dc,
-            stroke_x=dc.stroke_x * k,
-            stroke_y=dc.stroke_y * k,
-            stroke_alt=dc.stroke_alt * k,
+            self.source,
+            self.scale,
+            self.stroke_ratio,
+            dc.window_width / 2 + self.offset,
+            self.top_ratio * dc.cap,
         )
-        rec = RecordingPen()
-        self.source().draw(rec, heavy)
 
-        bp = BoundsPen(None)
-        rec.replay(bp)
-        x_min, _, x_max, y_max = bp.bounds
 
-        s = self.scale
-        cx = dc.window_width / 2 + self.offset
-        top = self.top_ratio * dc.cap
-        t = Transform(s, 0, 0, s, cx - s * (x_min + x_max) / 2, top - s * y_max)
-        rec.replay(TransformPen(pen, t))
+def draw_scaled(pen, dc, source, scale, stroke_ratio, cx, top):
+    """Draw `source` scaled by `scale`, centred on `cx` with its top at `top`."""
+    k = stroke_ratio / scale
+    heavy = dataclasses.replace(
+        dc,
+        stroke_x=dc.stroke_x * k,
+        stroke_y=dc.stroke_y * k,
+        stroke_alt=dc.stroke_alt * k,
+    )
+    rec = RecordingPen()
+    source().draw(rec, heavy)
+
+    bp = BoundsPen(None)
+    rec.replay(bp)
+    x_min, _, x_max, y_max = bp.bounds
+
+    s = scale
+    t = Transform(s, 0, 0, s, cx - s * (x_min + x_max) / 2, top - s * y_max)
+    rec.replay(TransformPen(pen, t))
