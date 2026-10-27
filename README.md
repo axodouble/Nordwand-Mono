@@ -1,93 +1,146 @@
 ![Nordwand Mono](assets/banner.png)
 
-A compact neo-grotesk font designed for coding.
+Nordwand Mono is a compact neo-grotesk monospaced typeface designed for programming. Every glyph is drawn procedurally in Python, so the metrics and stroke weights can be adjusted to produce custom builds.
 
-![Specimen](specimens/specimen.pdf)
+See the [specimen (PDF)](specimens/specimen.pdf) for an overview of the character set and weights.
 
-## Philosophy
+## Design
 
-I'm very passionate about the font I am using for my terminal and overall neovim experience, and I couldn't find the "perfect" font. So I decided to design one from scratch using python. This font aims to bring some elements from the all time classic "Univers" font into the proportions of the "JetBrains Mono" font. The name "Nordwand" is a reference to switzerland and its iconic typography – bringing it into the stiff and cold atmosphere of the swiss north faces.
+Nordwand Mono combines elements of Adrian Frutiger's Univers with the proportions of JetBrains Mono. The name refers to the north faces (*Nordwände*) of the Swiss Alps, and to the Swiss typographic tradition the design draws on.
 
-Amongst the inspirations for the design, you might identify:
+Other references include:
 
-- Univers from Adrian Frutiger
-- SF Pro & SF Mono from Apple
-- Alpes Mono from Sharp Type
-- Ubuntu Mono from Dalton Maag
+- Univers (Adrian Frutiger)
+- SF Pro and SF Mono (Apple)
+- Alpes Mono (Sharp Type)
+- Ubuntu Mono (Dalton Maag)
+- Berkeley Mono (U.S Graphic Company)
 
-## Alternative characters
+## OpenType features
 
-Some alternative character designs are available to tweak the vibe of the font to your liking. See the [alternative characters document](doc/alternative_characters.md) for a visual comparison and the corresponding OpenType feature tags.
+### Character variants
 
-## Stylistic sets
+Alternative designs are available for several characters. See [alternative characters](doc/alternative_characters.md) for a visual comparison and the corresponding feature tags.
 
-Stylistic sets switch groups of related glyphs at once: `ss02` enables the arrow ligatures and `ss03` uses wide-angled `<`, `>` and arrow heads. See the [stylistic sets document](doc/stylistic_sets.md) for details and how to enable them in common editors and terminals.
+### Stylistic sets
 
-## Ligatures
+Stylistic sets switch groups of related glyphs at once:
 
-The font includes minimal `->` and `=>` ligatures. Repeated `=`, `-`, `_`, and
-`#` characters can use joining forms, allowing their horizontal bars to
-connect across runs of any length. These are off by default; enable the `dlig`
-feature to turn them on (see the [stylistic sets document](doc/stylistic_sets.md)).
+| Tag | Effect |
+| --- | --- |
+| `ss02` | Arrow ligatures |
+| `ss03` | Wide-angled `<`, `>` and arrow heads |
 
-## Nerdwand Mono
+See [stylistic sets](doc/stylistic_sets.md) for details and for instructions on enabling them in common editors and terminals.
 
-Nerdwand Mono is the [Nerd Font](https://www.nerdfonts.com) version of Nordwand Mono, patched with the complete set of icons. Icons are kept to a single cell, so the font stays strictly monospaced. It is not attached to releases; build it locally with `make build` then `make build-nerd-font`. This requires [uv](https://docs.astral.sh/uv/getting-started/installation/) and [fontforge](https://fontforge.org) (`brew install fontforge` on macOS, `fontforge python3-fontforge` on Debian and Ubuntu), and an internet connection on the first run to download the Nerd Fonts patcher. The patched fonts, with the font license and the licenses of the bundled icon sets, are generated inside `./fonts/nerd-font`.
+### Ligatures
 
-## Compile your own custom version
+The font includes minimal `->` and `=>` ligatures. Runs of `=`, `-`, `_` and `#` can use joining forms, so their horizontal bars connect across runs of any length. Joining forms are disabled by default and are enabled with the `dlig` feature.
 
-This font is generated with python. Each glyph is drawn from a python glyph class, in which you can inject a drawing context object. You can for example modify some metrics like the x-height, the capital height etc.
+## Installation
 
-To do so, override the config.example.yml with the values of your liking. Be sure to visualize the individual glyphs with `python -m visualize --config config.yml <glyph_id>`. Then you can geneate the full font with `python -m generate_font --config config.yml`. The font files will be generated inside `./custom-fonts`.
+Prebuilt font files are attached to each [release](../../releases).
 
-For inspiration, browse the [`./configs`](configs) folder to see the font with other metrics configurations. Each subfolder contains a `config.yml` and a `sample.png` showing a code sample rendered with that configuration. To add your own, create `configs/<name>/config.yml` and run `python -m scripts.config_sample <name>`: it builds the regular weight of the font (or another one with `--weight`) and writes the matching `configs/<name>/sample.png`.
+## Building from source
 
-### Adjusting the weight
+Requirements: [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
-The stroke weights in the config file set the Regular weight, and every other weight is scaled from them. To choose which weights are exported, or to give a weight its own stroke dimensions, add a `weights` section:
+```sh
+make install     # install the Python dependencies
+make build-font  # build TTF, WOFF and WOFF2 into ./fonts
+make build       # build the fonts, banner, specimen, samples and docs
+```
+
+### Nerd Font variant
+
+Nerdwand Mono is the [Nerd Font](https://www.nerdfonts.com) variant of Nordwand Mono, patched with the complete icon set. Icons occupy a single cell, so the font remains strictly monospaced. It is not attached to releases and must be built locally:
+
+```sh
+make build
+make build-nerd-font
+```
+
+This additionally requires [FontForge](https://fontforge.org) (`brew install fontforge` on macOS, `apt install fontforge python3-fontforge` on Debian and Ubuntu), and network access on the first run to download the Nerd Fonts patcher. The patched fonts, the font license and the licenses of the bundled icon sets are written to `./fonts/nerd-font`.
+
+## Custom builds
+
+Each glyph is a Python class drawn from a drawing context that holds the font metrics (x-height, cap height, stroke weights, etc.). Overriding these values produces a custom build.
+
+1. Copy `config.example.yml` to `config.yml` and edit the values.
+2. Preview individual glyphs:
+
+   ```sh
+   uv run python -m visualize --config config.yml lowercase_a
+   ```
+
+3. Build the fonts:
+
+   ```sh
+   uv run python -m generate_font --config config.yml
+   ```
+
+   The files are written to `./custom-fonts/<FamilyName>`, so they do not overwrite the default build.
+
+> [!WARNING]
+> The design is tuned for the default metrics. Some glyphs may need adjustments when the metrics are changed.
+
+### Example configurations
+
+The [`configs`](configs) folder contains alternative configurations, each with a `config.yml` and a `sample.png` rendered from it. To add one, create `configs/<name>/config.yml` and run:
+
+```sh
+uv run python -m scripts.config_sample <name>
+```
+
+This builds the Regular weight (or another weight with `--weight`) and writes `configs/<name>/sample.png`.
+
+### Weights
+
+The stroke widths in the configuration define the Regular weight; all other weights are derived from them. To select which weights are exported, or to give a weight explicit stroke widths, add a `weights` section:
 
 ```yaml
 weights:
   400:
   425:
     name: Book
-    stroke_x: 90 # vertical strokes
-    stroke_y: 84 # horizontal strokes
-    stroke_alt: 72 # crossbars, like the middle of e
+    stroke_x: 90   # vertical strokes
+    stroke_y: 84   # horizontal strokes
+    stroke_alt: 72 # crossbars, e.g. the bar of e
   700:
 ```
 
-Only the listed weights are built. Strokes you leave out are scaled from the Regular ones as usual, and weights between the standard ones (like 425 here) need a `name`. The [LoDPI configuration](configs/LoDPI/config.yml) uses this to add a heavier Book weight for non-Retina screens. Some terminals can also thicken text on macOS without a custom build, like Ghostty with [`font-thicken`](https://ghostty.org/docs/config/reference#font-thicken).
+Only the listed weights are built.
 
-> [!WARNING]
-> There are no guarantees that the font might look good with different metrics, and some glyphs might require some tweaking if the metrics are altered !
+## Character set
 
-## Characters
+![Character set](assets/samples/sample_char.png)
 
-![characters](assets/samples/sample_char.png)
+The font covers Latin (including the accented letters of most European languages) and Cyrillic.
 
 ## Weights
 
-![weights](assets/samples/sample_weights.png)
+![Weights](assets/samples/sample_weights.png)
 
 ## Samples
 
-![python](assets/samples/les_drus.png)
+![Les Drus](assets/samples/les_drus.png)
 
 ### Python
 
-![python](assets/samples/sample_1.png)
+![Python sample](assets/samples/sample_1.png)
 
 ### C++
 
-![c++](assets/samples/sample_2.png)
+![C++ sample](assets/samples/sample_2.png)
 
 ### Haskell
 
-![haskell](assets/samples/sample_3.png)
-
-## Alternative Alphabets
+![Haskell sample](assets/samples/sample_3.png)
 
 ### Cyrillic
 
-![Cyrillic](assets/samples/sample_cyrillic.jpg)
+![Cyrillic sample](assets/samples/sample_cyrillic.jpg)
+
+## License
+
+The font files are licensed under the [SIL Open Font License 1.1](LICENSE-FONT.txt). The source code is licensed under the [MIT License](LICENSE.txt).
