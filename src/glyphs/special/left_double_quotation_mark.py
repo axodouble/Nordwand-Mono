@@ -1,12 +1,9 @@
-from glyphs.special.left_single_quotation_mark import LeftSingleQuotationMarkGlyph
-from glyphs.special.right_double_quotation_mark import RightDoubleQuotationMarkGlyph
+from glyphs.special.quote import QuoteGlyph
 
 
-class LeftDoubleQuotationMarkGlyph(LeftSingleQuotationMarkGlyph):
-    """Two `‘`, spaced like the bars of `"`."""
-
+class LeftDoubleQuotationMarkGlyph(QuoteGlyph):
     name = "left_double_quotation_mark"
     unicode = "0x201C"
-    gap = RightDoubleQuotationMarkGlyph.gap
-    draw = RightDoubleQuotationMarkGlyph.draw
-    offset = -10
+    turned = True
+    double = True
+    offset = 0
