@@ -469,6 +469,10 @@ _SEGMENTS = [
 def _bar(divider, start=None):
     runs = [(start, _SEGMENTS[0][2], None)] if start else []
     for i, (text, fg, bg) in enumerate(_SEGMENTS):
+        if i == 0 and start:
+            # The start cap takes the place of the leading space, so the text
+            # lines up with the bars that have none
+            text = text[1:]
         next_bg = _SEGMENTS[i + 1][2] if i + 1 < len(_SEGMENTS) else None
         runs += [(text, fg, bg), (divider, bg, next_bg)]
     return runs
