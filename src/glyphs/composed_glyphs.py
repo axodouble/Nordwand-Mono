@@ -363,6 +363,14 @@ class LowercaseSCaronGlyph(ComposedGlyph):
     accent_y = _lc_accent
 
 
+class LowercaseZCaronGlyph(ComposedGlyph):
+    name = "lowercase_zcaron"
+    unicode = "0x17E"
+    base_glyph_class = LowercaseZGlyph
+    accent_class = Caron
+    accent_y = _lc_accent
+
+
 # ── Lowercase with breve ─────────────────────────────────────────────
 
 
@@ -391,6 +399,39 @@ class LowercaseDotlessI2Glyph(LowercaseI2Glyph):
 
     def draw(self, pen, dc):
         self.draw_base(pen, dc)
+
+
+# ── L with middle dot (Catalan) ──────────────────────────────────────
+
+
+def _draw_l_dot(pen, dc, x, y):
+    """Middle dot centered between the stem of an L and its right edge."""
+    s = 1.4 * dc.stroke_x
+    draw_rect(pen, x - s, y - s / 2, x, y + s / 2)
+
+
+class LowercaseLDotGlyph(LowercaseLGlyph):
+    name = "lowercase_ldot"
+    unicode = "0x140"
+
+    def draw(self, pen, dc):
+        super().draw(pen, dc)
+        b = dc.body_bounds(
+            offset=self.offset, height="ascent", width_ratio=self.width_ratio
+        )
+        _draw_l_dot(pen, dc, b.x2, dc.x_height / 2)
+
+
+class UppercaseLDotGlyph(UppercaseLGlyph):
+    name = "uppercase_ldot"
+    unicode = "0x13F"
+
+    def draw(self, pen, dc):
+        super().draw(pen, dc)
+        b = dc.body_bounds(
+            offset=self.offset, height="cap", width_ratio=self.width_ratio
+        )
+        _draw_l_dot(pen, dc, b.x2, dc.cap / 2)
 
 
 # ── Uppercase with acute ─────────────────────────────────────────────
@@ -573,6 +614,14 @@ class UppercaseUDieresisGlyph(ComposedGlyph):
     accent_y = _uc_accent
 
 
+class UppercaseYDieresisGlyph(ComposedGlyph):
+    name = "uppercase_ydieresis"
+    unicode = "0x178"
+    base_glyph_class = UppercaseYGlyph
+    accent_class = Dieresis
+    accent_y = _uc_accent
+
+
 # ── Uppercase with tilde ─────────────────────────────────────────────
 
 
@@ -637,6 +686,14 @@ class UppercaseSCaronGlyph(ComposedGlyph):
     name = "uppercase_scaron"
     unicode = "0x160"
     base_glyph_class = UppercaseSGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class UppercaseZCaronGlyph(ComposedGlyph):
+    name = "uppercase_zcaron"
+    unicode = "0x17D"
+    base_glyph_class = UppercaseZGlyph
     accent_class = Caron
     accent_y = _uc_accent
 
@@ -851,9 +908,7 @@ class OgonekComposedGlyph(ComposedGlyph):
             x1, _, x2, _ = path.bounds
             width = self.ogonek_width * dc.stroke_x
             x = x2 - self.ogonek_inset * (x2 - x1) - width / 2
-            Ogonek().draw_at(
-                pen, dc, x=x, y=self.accent_y, width=width, start=start
-            )
+            Ogonek().draw_at(pen, dc, x=x, y=self.accent_y, width=width, start=start)
 
 
 class LowercaseAOgonekGlyph(OgonekComposedGlyph):
