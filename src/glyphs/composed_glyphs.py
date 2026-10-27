@@ -1145,13 +1145,90 @@ class LowercaseDCaronGlyph(ComposedGlyph):
         base = self._resolve_base_class(dc)()
         mark = self.accent_class()
         margin = 0
-        room = dc.window_width - 2 * margin - mark.width(dc)
+        mark_width = mark.gap_width(dc) + mark.top_width(dc)
+        room = dc.window_width - 2 * margin - mark_width
         base.width_ratio = min(base.width_ratio, (room - dc.stroke_x) / dc.width)
         d_width = dc.width * base.width_ratio + dc.stroke_x
-        x1 = (dc.window_width - d_width - mark.width(dc)) / 2
+        x1 = (dc.window_width - d_width - mark_width) / 2
         base.offset = x1 - (dc.window_width - d_width) / 2
         base.draw(pen, dc)
-        mark.draw_at(pen, dc, x=x1 + d_width, y=dc.ascent)
+        mark.draw_at(pen, dc, x=x1 + d_width + mark.gap_width(dc), y=dc.ascent)
+
+
+class LowercaseRAcuteGlyph(ComposedGlyph):
+    name = "lowercase_racute"
+    unicode = "0x155"
+    base_glyph_class = LowercaseRGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class UppercaseRAcuteGlyph(ComposedGlyph):
+    name = "uppercase_racute"
+    unicode = "0x154"
+    base_glyph_class = UppercaseRGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+class UppercaseLAcuteGlyph(ComposedGlyph):
+    name = "uppercase_lacute"
+    unicode = "0x139"
+    base_glyph_class = UppercaseLGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+    def accent_x(self, dc, base, b):
+        return b.x1 + Acute.stroke_ratio * dc.stroke_x / 2
+
+
+class LowercaseLAcuteGlyph(ComposedGlyph):
+    """l with the acute above its ascender, centered on the stem."""
+
+    name = "lowercase_lacute"
+    unicode = "0x13A"
+    base_glyph_class = LowercaseLGlyph
+    accent_class = Acute
+    # Above the ascent by most of the gap capitals leave below their accent
+    accent_y = fc.ascent + 0.8 * (fc.accent_cap - fc.cap)
+
+    def accent_x(self, dc, base, b):
+        return base.stem_center(dc)
+
+
+class UppercaseLCaronGlyph(ComposedGlyph):
+    """L with the vertical caron beside the top of its stem."""
+
+    name = "uppercase_lcaron"
+    unicode = "0x13D"
+    base_glyph_class = UppercaseLGlyph
+    accent_class = CaronVertical
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        base.draw(pen, dc)
+        b = dc.body_bounds(
+            offset=base.offset, height="cap", width_ratio=base.width_ratio
+        )
+        self.accent_class().draw_at(pen, dc, x=(b.x1 + b.x2) * 0.55, y=dc.cap)
+
+
+class LowercaseLCaronGlyph(ComposedGlyph):
+    """l with the vertical caron beside the top of its stem."""
+
+    name = "lowercase_lcaron"
+    unicode = "0x13E"
+    base_glyph_class = LowercaseLGlyph
+    accent_class = CaronVertical
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        b = dc.body_bounds(
+            offset=base.offset, height="cap", width_ratio=base.width_ratio
+        )
+        base.draw(pen, dc)
+        mark = self.accent_class()
+        mark.draw_at(pen, dc, x=(b.x2 + b.xmid) / 2, y=dc.ascent)
 
 
 class LowercaseTCaronGlyph(ComposedGlyph):
@@ -1171,7 +1248,7 @@ class LowercaseTCaronGlyph(ComposedGlyph):
         top = (1 + base.up_ratio) * dc.x_height
         accent = self.accent_class()
         accent.height = 0.3
-        accent.draw_at(pen, dc, x=(b.xmid + b.x2) / 2, y=top)
+        accent.draw_at(pen, dc, x=(b.xmid + b.x2) * 0.55, y=top)
 
 
 # ── Polish: ogonek ───────────────────────────────────────────────────
