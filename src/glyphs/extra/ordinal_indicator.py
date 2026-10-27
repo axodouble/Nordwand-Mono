@@ -18,7 +18,8 @@ class OrdinalIndicatorGlyph(Glyph):
 
     offset = 0
     scale = 0.55
-    stroke_ratio = 0.8
+    stroke_ratio = 0.7
+    top_ratio = 1  # Top of the character, relative to the cap height
 
     def draw(self, pen, dc):
         k = self.stroke_ratio / self.scale
@@ -37,5 +38,6 @@ class OrdinalIndicatorGlyph(Glyph):
 
         s = self.scale
         cx = dc.window_width / 2 + self.offset
-        t = Transform(s, 0, 0, s, cx - s * (x_min + x_max) / 2, dc.cap - s * y_max)
+        top = self.top_ratio * dc.cap
+        t = Transform(s, 0, 0, s, cx - s * (x_min + x_max) / 2, top - s * y_max)
         rec.replay(TransformPen(pen, t))
