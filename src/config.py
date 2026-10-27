@@ -52,6 +52,37 @@ class FontConfig:
     v_overshoot_cap: int = 16
     h_overshoot: int = 10
 
+    # Weights to export, as weight -> {name, stroke_x, stroke_y, stroke_alt}.
+    # Every key is optional; strokes left out follow DrawConfig.weight().
+    weights = {w: {} for w in (100, 200, 300, 375, 400, 425, 500, 600, 700)}
+
+
+# Standard names, used when a weight in the config doesn't set its own.
+WEIGHT_NAMES = {
+    100: "Thin",
+    200: "ExtraLight",
+    300: "Light",
+    350: "SemiLight",
+    375: "Retina",
+    400: "Regular",
+    425: "Book",
+    500: "Medium",
+    600: "SemiBold",
+    700: "Bold",
+    800: "ExtraBold",
+    900: "Black",
+}
+
+WEIGHT_KEYS = {"name", "stroke_x", "stroke_y", "stroke_alt"}
+
+
+def weight_name(w):
+    """Style name of weight `w`: its config `name`, else the standard one."""
+    name = FontConfig.weights.get(w, {}).get("name") or WEIGHT_NAMES.get(w)
+    if name is None:
+        raise ValueError(f"Weight {w} needs a `name` in the config")
+    return name
+
 
 @dataclass
 class DrawConfig(FontConfig):
@@ -78,35 +109,37 @@ class DrawConfig(FontConfig):
 
     @classmethod
     def weight(cls, w=400):
-        """Return a DrawConfig with heavier stroke weights for a bold variant."""
-        from math import log, exp
+        """Return a DrawConfig with heavier stroke weights for a bold variant.
 
-        brx = 1.6
-        ratio_x = exp((w - 400) * log(brx) / 300)
+        Each metric is tabulated at the weights in `ws`; weights in between
+        are linearly interpolated.
+        """
+        from bisect import bisect_right
 
-        bry = 1.5
-        ratio_y = exp((w - 400) * log(bry) / 300)
+        ws = [100, 200, 300, 375, 400, 425, 500, 600, 700]
+        # Multipliers of the 400 values
+        ratio_x = [0.625, 0.731, 0.855, 0.962, 1, 1.04, 1.17, 1.368, 1.6]
+        ratio_y = [0.667, 0.763, 0.874, 0.967, 1, 1.034, 1.145, 1.31, 1.5]
+        ratio_alt = [0.833, 0.886, 0.941, 0.985, 1, 1.015, 1.063, 1.129, 1.2]
+        ratio_hx = [0.909, 0.938, 0.969, 0.992, 1, 1.008, 1.032, 1.066, 1.1]
+        ratio_hy = [1.0, 1.0, 1.0, 1.0, 1, 1.0, 1.0, 1.0, 1.0]
+        # Absolute values
+        tapers = [0.5, 0.5, 0.5, 0.5, 0.5, 0.479, 0.415, 0.33, 0.245]
 
-        bra = 1.2
-        ratio_alt = exp((w - 400) * log(bra) / 300)
+        def at(values):
+            i = min(max(bisect_right(ws, w), 1), len(ws) - 1)
+            t = min(max((w - ws[i - 1]) / (ws[i] - ws[i - 1]), 0), 1)
+            return values[i - 1] + t * (values[i] - values[i - 1])
 
-        rx = 15
-        exh = exp((w - 400) * log(rx) / 300)
-
-        bhy = 1.1
-        hy_ratio = exp((w - 400) * log(bhy) / 300)
-
-        bhx = 1.1
-        hx_ratio = exp((w - 400) * log(bhx) / 300)
-
-        # Function mapping 100 → 0.5 and 700 → 0.2
-        taper = min(0.5, 0.5 - 0.00085 * (w - 400))
+        ratio_x, ratio_y, ratio_alt = at(ratio_x), at(ratio_y), at(ratio_alt)
+        hx_ratio, hy_ratio = at(ratio_hx), at(ratio_hy)
+        taper = at(tapers)
 
         return cls(
             stroke_x=int(cls.stroke_x * ratio_x),
             stroke_y=int(cls.stroke_y * ratio_y),
             stroke_alt=int(cls.stroke_alt * ratio_alt),
-            x_height=cls.x_height + exh,
+            x_height=cls.x_height,
             cap=cls.cap,
             accent=cls.cap,
             accent_cap=cls.accent_cap,
@@ -117,6 +150,21 @@ class DrawConfig(FontConfig):
             hx=hx_ratio * cls.hx,
             cap_hy=hy_ratio * cls.cap_hy,
         )
+
+    @classmethod
+    def for_weight(cls, w=400, italic=False):
+        """Return the DrawConfig of weight `w`, with its config stroke overrides."""
+        if w != 400:
+            dc = cls.weight(w=w)
+        elif italic:
+            dc = cls.for_italic()
+        else:
+            dc = cls()
+        for key, value in FontConfig.weights.get(w, {}).items():
+            if key != "name":
+                setattr(dc, key, value)
+        dc.italic = italic
+        return dc
 
     @classmethod
     def for_italic(cls):
@@ -199,9 +247,37 @@ class DrawConfig(FontConfig):
 def config_keys():
     """Names of all overridable configuration values."""
     keys = {f.name for f in dataclasses.fields(DrawConfig)}
-    # `default_stroke` is a plain class attribute (no annotation), not a field.
-    keys.add("default_stroke")
+    # `default_stroke` and `weights` are plain class attributes, not fields.
+    keys.update({"default_stroke", "weights"})
     return keys
+
+
+def parse_weights(value):
+    """Normalise the `weights` config value to {weight: {key: value}}.
+
+    Accepts a list of weights (`[400, 425, 700]`) or a mapping of weight to
+    its settings (`{425: {name: Book, stroke_y: 84}}`, `{700: null}`).
+    """
+    if isinstance(value, list):
+        value = {w: {} for w in value}
+    if not isinstance(value, dict) or not value:
+        raise ValueError("`weights` must be a non-empty list or mapping of weights")
+
+    weights = {}
+    for w, settings in value.items():
+        if not isinstance(w, int) or not 1 <= w <= 1000:
+            raise ValueError(f"Weight {w!r} must be an integer from 1 to 1000")
+        settings = settings or {}
+        unknown = set(settings) - WEIGHT_KEYS
+        if unknown:
+            raise ValueError(
+                f"Unknown keys for weight {w}: {sorted(unknown)}. "
+                f"Valid keys: {sorted(WEIGHT_KEYS)}"
+            )
+        if "name" not in settings and w not in WEIGHT_NAMES:
+            raise ValueError(f"Weight {w} needs a `name` in the config")
+        weights[w] = dict(settings)
+    return dict(sorted(weights.items()))
 
 
 def apply_config_overrides(overrides):
@@ -221,6 +297,9 @@ def apply_config_overrides(overrides):
         raise ValueError(
             f"Unknown config keys: {sorted(unknown)}. Valid keys: {sorted(valid)}"
         )
+
+    if "weights" in overrides:
+        overrides = {**overrides, "weights": parse_weights(overrides["weights"])}
 
     for key, value in overrides.items():
         for cls in (FontConfig, DrawConfig):

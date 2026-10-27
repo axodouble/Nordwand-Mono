@@ -14,7 +14,7 @@ from fontTools.misc.transform import Transform
 
 sys.path.insert(0, "src")
 from config import FontConfig as fc
-from config import DrawConfig
+from config import DrawConfig, WEIGHT_NAMES, weight_name
 from glyphs import InfiniteLigatureForm, LigatureGlyph
 from generate_font import discover_glyphs, select_style_glyphs, skew_path
 
@@ -240,6 +240,7 @@ def visualize_glyph(
     show_controls=False,
     show_optical_center=False,
     configs=None,
+    labels=None,
     italic=False,
     ref_font=None,
     ref_char=None,
@@ -275,11 +276,17 @@ def visualize_glyph(
         rec = record(dc)
         path = recording_to_mpl_path(rec)
         color = COLORS[i % len(COLORS)]
-        patch = mpatches.PathPatch(path, facecolor=color, edgecolor="none", alpha=0.7)
+        label = labels[i] if labels else None
+        patch = mpatches.PathPatch(
+            path, facecolor=color, edgecolor="none", alpha=0.7, label=label
+        )
         ax.add_patch(patch)
 
         if show_controls:
             plot_control_points(ax, rec)
+
+    if labels and len(configs) > 1:
+        ax.legend(loc="upper right")
 
     ref_advance = None
     if ref_font:
@@ -508,8 +515,9 @@ if __name__ == "__main__":
         type=str,
         default="regular",
         help=(
-            "Style: weight name (thin, extralight, light, regular, medium, "
-            "semibold, bold), 'italic', or comma-separated stroke widths"
+            "Comma-separated styles to overlay (e.g. 'regular,bold'): weight "
+            "names (thin, light, regular, book, bold, ... or a name from the "
+            "config), 'italic', or stroke widths. Text mode uses the first."
         ),
     )
     parser.add_argument("--pt", type=float, default=None, help="Point size (text mode)")
@@ -547,28 +555,24 @@ if __name__ == "__main__":
         applied = load_config(args.config)
         print(f"Loaded config overrides from {args.config}: {applied}")
 
-    WEIGHT_ALIASES = {
-        "thin": 100,
-        "extralight": 200,
-        "light": 300,
-        "regular": 400,
-        "medium": 500,
-        "semibold": 600,
-        "bold": 700,
-    }
+    WEIGHT_ALIASES = {name.lower(): w for w, name in WEIGHT_NAMES.items()}
+    WEIGHT_ALIASES.update({weight_name(w).lower(): w for w in fc.weights})
 
-    style = args.s.strip().lower()
     italic = False
-    if style == "italic":
-        configs = [DrawConfig.for_italic()]
-        italic = True
-    elif style in WEIGHT_ALIASES:
-        w = WEIGHT_ALIASES[style]
-        configs = [DrawConfig() if w == 400 else DrawConfig.weight(w=w)]
-    else:
-        configs = [
-            DrawConfig(stroke_x=int(s), stroke_y=int(s) - 10) for s in args.s.split(",")
-        ]
+    configs, labels = [], []
+    for style in args.s.lower().split(","):
+        style = style.strip()
+        if style == "italic":
+            configs.append(DrawConfig.for_italic())
+            italic = True
+        elif style in WEIGHT_ALIASES:
+            w = WEIGHT_ALIASES[style]
+            configs.append(DrawConfig() if w == 400 else DrawConfig.weight(w=w))
+        elif style.isdigit():
+            configs.append(DrawConfig(stroke_x=int(style), stroke_y=int(style) - 10))
+        else:
+            parser.error(f"Unknown style {style!r} in -s")
+        labels.append(style)
 
     if args.text is not None:
         visualize_text(
@@ -586,6 +590,7 @@ if __name__ == "__main__":
             show_controls=args.c,
             show_optical_center=args.o,
             configs=configs,
+            labels=labels,
             italic=italic,
             ref_font=args.ref,
             ref_char=args.ref_char,

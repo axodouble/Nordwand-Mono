@@ -21,10 +21,6 @@ GROUPS = [
         "Punctuation & Symbols",
         "!\"#$%&'()*+,-./:;<=>?@[\\]^{|}~→",
     ),
-    (
-        "Accented Lowercase",
-        "áàâãäåçéèêëíìîïñóòôõöúùûüýÿš",
-    ),
 ]
 
 BG = (1, 1, 1)
@@ -55,90 +51,12 @@ FAMILY_VARIANTS = [
 ]
 
 
-TITLE_FONT = "U001"
-TITLE_FONT_REGULAR = "U001"
+# Standard PDF fonts: built into reportlab and every PDF viewer, no file needed.
+TITLE_FONT = "Helvetica-Bold"
+TITLE_FONT_REGULAR = "Helvetica"
 
 # Sentinel: when found in the samples list, force a new page before the next sample.
 SAMPLE_SEP = object()
-
-
-def _find_macos_font(filename):
-    """Locate a font file by basename in the standard macOS font directories."""
-    import os
-
-    dirs = [
-        os.path.expanduser("~/Library/Fonts"),
-        "/Library/Fonts",
-        "/System/Library/Fonts",
-        "/System/Library/Fonts/Supplemental",
-    ]
-    for d in dirs:
-        path = os.path.join(d, filename)
-        if os.path.exists(path):
-            return path
-    raise FileNotFoundError(f"Font '{filename}' not found in macOS font directories")
-
-
-def _otf_to_ttf(otf_path):
-    """Convert an OTF (CFF outlines) to a temp TTF (glyf outlines) for reportlab."""
-    import tempfile
-    from fontTools.ttLib import TTFont as FTTTFont, newTable
-    from fontTools.pens.cu2quPen import Cu2QuPen
-    from fontTools.pens.ttGlyphPen import TTGlyphPen
-
-    font = FTTTFont(otf_path)
-    if "glyf" in font:
-        return otf_path  # already TTF
-
-    glyph_set = font.getGlyphSet()
-    glyph_order = font.getGlyphOrder()
-
-    glyf_data = {}
-    for name in glyph_order:
-        ttf_pen = TTGlyphPen(None)
-        cu2qu_pen = Cu2QuPen(ttf_pen, max_err=1.0, reverse_direction=True)
-        glyph_set[name].draw(cu2qu_pen)
-        glyf_data[name] = ttf_pen.glyph()
-
-    for tag in ("CFF ", "CFF2"):
-        if tag in font:
-            del font[tag]
-
-    glyf = newTable("glyf")
-    glyf.glyphs = glyf_data
-    glyf.glyphOrder = glyph_order
-    font["glyf"] = glyf
-    font["loca"] = newTable("loca")
-
-    font.sfntVersion = "\x00\x01\x00\x00"
-    font["head"].indexToLocFormat = 0
-
-    maxp = font["maxp"]
-    maxp.tableVersion = 0x00010000
-    for attr, default in (
-        ("maxZones", 1),
-        ("maxTwilightPoints", 0),
-        ("maxStorage", 0),
-        ("maxFunctionDefs", 0),
-        ("maxInstructionDefs", 0),
-        ("maxStackElements", 0),
-        ("maxSizeOfInstructions", 0),
-        ("maxComponentElements", 0),
-        ("maxComponentDepth", 0),
-    ):
-        if not hasattr(maxp, attr):
-            setattr(maxp, attr, default)
-
-    tmp = tempfile.NamedTemporaryFile(suffix=".ttf", delete=False)
-    tmp.close()
-    font.save(tmp.name)
-    return tmp.name
-
-
-def _register_macos_otf(reportlab_name, filename):
-    pdfmetrics.registerFont(
-        TTFont(reportlab_name, _otf_to_ttf(_find_macos_font(filename)))
-    )
 
 
 def _draw_unicode_inventory(c, font_path, page_w, page_h):
@@ -201,10 +119,8 @@ def _draw_unicode_inventory(c, font_path, page_w, page_h):
 def render_specimen(font_path, output="specimen.pdf"):
     import os
 
-    os.makedirs(os.path.dirname(output), exist_ok=True)
+    os.makedirs(os.path.dirname(output) or ".", exist_ok=True)
     pdfmetrics.registerFont(TTFont("Nordwand Mono", font_path))
-    _register_macos_otf(TITLE_FONT, "Switzer-Bold.otf")
-    _register_macos_otf(TITLE_FONT_REGULAR, "Switzer-Regular.otf")
 
     # Register every available family variant for the overview page
     font_dir = os.path.dirname(font_path)
@@ -279,55 +195,47 @@ def render_specimen(font_path, output="specimen.pdf"):
     draw_block(regulars, mid, title_bottom)
     draw_block(italics, bottom_margin, mid)
 
-    c.showPage()
+    def draw_glyph_page(title, font_name):
+        c.showPage()
+        c.setFillColorRGB(*BG)
+        c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
 
-    # White background for the rest of the specimen
-    c.setFillColorRGB(*BG)
-    c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
+        y = page_h - 30 * mm
 
-    y = page_h - 30 * mm
-
-    # Title
-    c.setFillColorRGB(*FG)
-    c.setFont(TITLE_FONT, TITLE_SIZE)
-    c.drawString(MARGIN_X, y, "Nordwand Mono")
-    y -= TITLE_SIZE + 16 * mm
-
-    for group_label, chars in GROUPS:
-        # Section label
-        c.setFillColorRGB(*LABEL_COLOR)
-        c.setFont(TITLE_FONT, LABEL_SIZE)
-        c.drawString(MARGIN_X, y, group_label)
-        y -= LABEL_SIZE + CHAR_SIZE
-
-        # Lay out characters
+        # Title
         c.setFillColorRGB(*FG)
-        c.setFont("Nordwand Mono", CHAR_SIZE)
-        x = MARGIN_X
-        max_x = page_w - MARGIN_X
-        for ch in chars:
-            char_w = c.stringWidth(ch, "Nordwand Mono", CHAR_SIZE) + 8
-            if x + char_w > max_x:
-                y -= CHAR_SIZE + 10
-                x = MARGIN_X
-            c.drawString(x, y, ch)
-            x += char_w
+        c.setFont(TITLE_FONT, TITLE_SIZE)
+        c.drawString(MARGIN_X, y, title)
+        y -= TITLE_SIZE + 16 * mm
 
-        y -= 14 * mm
+        for group_label, chars in GROUPS:
+            # Section label
+            c.setFillColorRGB(*LABEL_COLOR)
+            c.setFont(TITLE_FONT, LABEL_SIZE)
+            c.drawString(MARGIN_X, y, group_label)
+            y -= LABEL_SIZE + CHAR_SIZE
 
-        # New page if running out of space
-        if y < 30 * mm:
-            c.showPage()
-            c.setFillColorRGB(*BG)
-            c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
-            y = page_h - 30 * mm
-            on_fresh_page = True
-        else:
-            on_fresh_page = False
+            # Lay out characters
+            c.setFillColorRGB(*FG)
+            c.setFont(font_name, CHAR_SIZE)
+            x = MARGIN_X
+            max_x = page_w - MARGIN_X
+            for ch in chars:
+                char_w = c.stringWidth(ch, font_name, CHAR_SIZE) + 8
+                if x + char_w > max_x:
+                    y -= CHAR_SIZE + 10
+                    x = MARGIN_X
+                c.drawString(x, y, ch)
+                x += char_w
+
+            y -= 14 * mm
+
+    draw_glyph_page("Nordwand Mono", "Nordwand Mono")
+    if any(name == "Nordwand Mono-Italic" for name, _ in available_variants):
+        draw_glyph_page("Nordwand Mono Italic", "Nordwand Mono-Italic")
 
     # --- Sample text page ---
-    if not on_fresh_page:
-        c.showPage()
+    c.showPage()
     c.setFillColorRGB(*BG)
     c.rect(0, 0, page_w, page_h, fill=1, stroke=0)
 
@@ -416,7 +324,7 @@ def render_specimen(font_path, output="specimen.pdf"):
         c.line(MARGIN_X, y, page_w - MARGIN_X, y)
         y -= LABEL_SIZE + 4
 
-        # Label: family name in Switzer Bold, size in Switzer Regular
+        # Label: family name in bold, size in regular
         c.setFillColorRGB(*FG)
         c.setFont(TITLE_FONT, LABEL_SIZE)
         c.drawString(MARGIN_X, y, family_label)

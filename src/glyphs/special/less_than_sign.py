@@ -10,7 +10,7 @@ class LessThenSignGlyph(Glyph):
     width_ratio = 1
     overlap = 0.6
     span = GreaterThenSignGlyph.span
-    stroke_ratio = 1.2
+    stroke_ratio = 1.45
 
     def draw(self, pen, dc):
         b = dc.body_bounds(

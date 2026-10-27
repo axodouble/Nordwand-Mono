@@ -9,12 +9,12 @@ class SharpSGlyph(Glyph):
     name = "sharp_s"
     unicode = "0xdf"
     offset = 12
-    upper_ratio = 0.9  # Upper loop width as a fraction of the lower loop width
+    upper_ratio = 0.7
     mid_ratio = 0.52
     width_ratio = 1.06
     offset_lower_bar = 0.3
     reach_upper_bar = 0.9
-    tail_reach = 0.15
+    tail_reach = 0.0
     stroke_x_ratio = 1.00
     stroke_y_ratio = 1.00
 
@@ -23,6 +23,7 @@ class SharpSGlyph(Glyph):
             offset=self.offset,
             height="cap",
             uppercase=True,
+            overshoot_top=True,
             width_ratio=self.width_ratio,
         )
         sx, sy = dc.stroke_x * self.stroke_x_ratio, dc.stroke_y * self.stroke_y_ratio
@@ -43,23 +44,23 @@ class SharpSGlyph(Glyph):
         # Left stem
         draw_rect(pen, b.x1, yt, b.x1 + sx, (ymid - sy / 2 + b.y2) / 2)
 
-        draw_corner(
-            pen,
-            sx,
-            sy,
-            b.x1,
-            (ymid - sy / 2 + b.y2) / 2,
-            (upper_x1 + upper_x2) / 2,
-            b.y2,
-            hx * (upper_x2 - upper_x1) / b.width,
-            hy * (1 - self.mid_ratio),
-            orientation="top-right",
-        )
+        # draw_corner(
+        #     pen,
+        #     sx,
+        #     sy,
+        #     b.x1,
+        #     (ymid - sy / 2 + b.y2) / 2,
+        #     (upper_x1 + upper_x2) / 2,
+        #     b.y2,
+        #     hx * (upper_x2 - upper_x1) / b.width,
+        #     hy * (1 - self.mid_ratio),
+        #     orientation="top-right",
+        # )
         draw_arch(
             pen,
             sx,
             sy,
-            upper_x1,
+            b.x1,
             ymid - sy / 2,
             upper_x2,
             b.y2,
@@ -68,6 +69,20 @@ class SharpSGlyph(Glyph):
             taper=0.75,
             side="bottom",
             cut="left",
+        )
+        draw_arch(
+            pen,
+            sx,
+            sy,
+            b.x1,
+            ymid - sy / 2,
+            upper_x2,
+            b.y2,
+            hx * (upper_x2 - upper_x1) / b.width,
+            hy * (1 - self.mid_ratio),
+            taper=0.75,
+            side="bottom",
+            cut="bottom",
         )
 
         # Lower loop (full width)
@@ -102,7 +117,8 @@ class SharpSGlyph(Glyph):
         )
 
 
-class CapitalSharpSGlyph(SharpSGlyph):
-    name = "capital_sharp_s"
-    unicode = "0x1e9e"
-    tail_reach = 0
+class SharpS2Glyph(SharpSGlyph):
+    name = "sharp_s_2"
+    unicode = "0xdf"
+    tail_reach = 0.15
+    font_feature = {"cv20": 1}

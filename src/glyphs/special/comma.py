@@ -13,7 +13,7 @@ class CommaGlyph(Glyph):
     taper = 0.66
     stroke_ratio = 1.2
 
-    def draw(self, pen, dc):
+    def points(self, dc):
         b = dc.body_bounds(
             offset=self.offset, height="x_height", width_ratio=self.width_ratio
         )
@@ -22,12 +22,12 @@ class CommaGlyph(Glyph):
         oy = self.vertical_offset * b.height
         fx = self.foot_offset * b.width
 
-        draw_polygon(
-            pen,
-            points=[
-                (b.xmid - sx / 2, oy),
-                (b.xmid + sx / 2, oy),
-                (b.xmid + self.taper * sx / 2 - fx, oy - (h - sx)),
-                (b.xmid - sx / 2 - fx, oy - h + sx),
-            ],
-        )
+        return [
+            (b.xmid - sx / 2, oy),
+            (b.xmid + sx / 2, oy),
+            (b.xmid + self.taper * sx / 2 - fx, oy - (h - sx)),
+            (b.xmid - sx / 2 - fx, oy - h + sx),
+        ]
+
+    def draw(self, pen, dc):
+        draw_polygon(pen, points=self.points(dc))

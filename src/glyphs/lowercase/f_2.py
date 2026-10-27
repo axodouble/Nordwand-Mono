@@ -11,6 +11,9 @@ class LowercaseF2Glyph(Glyph):
     rl_ratio = 0.55
     width_ratio = 1.05
 
+    def cross_bar_top(self, dc):
+        return dc.x_height
+
     def draw(self, pen, dc):
         b = dc.body_bounds(
             offset=self.offset, height="x_height", width_ratio=self.width_ratio
@@ -30,9 +33,9 @@ class LowercaseF2Glyph(Glyph):
         draw_rect(
             pen,
             b.xmid - left_len - dc.stroke_x / 2,
-            dc.x_height - dc.stroke_y,
+            self.cross_bar_top(dc) - dc.stroke_y,
             b.xmid + right_len + dc.stroke_x / 2,
-            dc.x_height,
+            self.cross_bar_top(dc),
         )
         # Corner
         draw_square_corner(

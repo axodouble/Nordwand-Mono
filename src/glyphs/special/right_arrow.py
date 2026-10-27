@@ -11,8 +11,8 @@ class RightArrowGlyph(Glyph):
     side_offset_right = 0.02
     width_ratio = 1.33
     overlap = 0.6
-    span = 0.65
-    arrow_width = 0.66
+    span = 0.4
+    arrow_width = 0.5
     stroke_ratio = 1.2
 
     def draw(self, pen, dc):
