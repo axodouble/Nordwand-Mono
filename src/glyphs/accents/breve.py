@@ -1,10 +1,11 @@
+from config import FontConfig as fc
 from glyphs.accents import Accent
 from draw.loop import draw_loop
 
 
 class Breve(Accent):
     name = "breve"
-    unicode = "0x306"
+    unicode = "0x2D8"
     height = 0.5
     offset_y = 0.05
     width = 1.1
@@ -33,3 +34,13 @@ class Breve(Accent):
             hy,
             cut="top",
         )
+
+
+class CombiningBreve(Breve):
+    name = "combining_breve"
+    unicode = "0x306"
+    number_characters = 0
+
+    def draw(self, pen, dc):
+        # Fallback placement when shaping does not apply the ccmp glyph.
+        self.draw_at(pen, dc, x=-fc.window_width / 2, y=fc.accent_cap)

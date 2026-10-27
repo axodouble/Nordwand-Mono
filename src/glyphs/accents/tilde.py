@@ -3,7 +3,7 @@ from glyphs.accents import Accent
 
 class Tilde(Accent):
     name = "accent_tilde"
-    unicode = None
+    unicode = "0x2DC"
     rescale = 0.7
 
     def draw_at(self, pen, dc, x, y):
