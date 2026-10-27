@@ -55,6 +55,7 @@ from glyphs.accents.dieresis import Dieresis
 from glyphs.accents.tilde import Tilde
 from glyphs.accents.caron import Caron
 from glyphs.accents.caron_vertical import CaronVertical
+from glyphs.accents.double_acute import DoubleAcute
 from glyphs.accents.ring import Ring
 from glyphs.accents.cedilla import Cedilla
 from glyphs.accents.macron import Macron
@@ -1282,6 +1283,41 @@ class LowercaseDStrokeGlyph(LowercaseDGlyph):
             b.x2 + self.bar_right * b.width,
             y + dc.stroke_y / 2,
         )
+
+
+# ── Hungarian: double acute ──────────────────────────────────────────
+
+
+class LowercaseODoubleAcuteGlyph(ComposedGlyph):
+    name = "lowercase_ohungarumlaut"
+    unicode = "0x151"
+    base_glyph_class = LowercaseOGlyph
+    accent_class = DoubleAcute
+    accent_y = _lc_accent
+
+
+class UppercaseODoubleAcuteGlyph(ComposedGlyph):
+    name = "uppercase_ohungarumlaut"
+    unicode = "0x150"
+    base_glyph_class = UppercaseOGlyph
+    accent_class = DoubleAcute
+    accent_y = _uc_accent
+
+
+class LowercaseUDoubleAcuteGlyph(ComposedGlyph):
+    name = "lowercase_uhungarumlaut"
+    unicode = "0x171"
+    base_glyph_class = LowercaseUGlyph
+    accent_class = DoubleAcute
+    accent_y = _lc_accent
+
+
+class UppercaseUDoubleAcuteGlyph(ComposedGlyph):
+    name = "uppercase_uhungarumlaut"
+    unicode = "0x170"
+    base_glyph_class = UppercaseUGlyph
+    accent_class = DoubleAcute
+    accent_y = _uc_accent
 
 
 # ── Polish: ogonek ───────────────────────────────────────────────────
