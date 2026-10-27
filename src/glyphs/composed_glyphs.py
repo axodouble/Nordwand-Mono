@@ -46,6 +46,7 @@ from glyphs.uppercase.h import UppercaseHGlyph
 from glyphs.lowercase.square.h import LowercaseHGlyph
 from glyphs.uppercase.d import UppercaseDGlyph
 from glyphs.lowercase.single_story.d import LowercaseDGlyph
+from glyphs.latin.uppercase.eth import UppercaseEthGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -1249,6 +1250,38 @@ class LowercaseTCaronGlyph(ComposedGlyph):
         accent = self.accent_class()
         accent.height = 0.3
         accent.draw_at(pen, dc, x=(b.xmid + b.x2) * 0.55, y=top)
+
+
+# ── Croatian, Bosnian, Serbian: D with stroke ────────────────────────
+
+
+class UppercaseDStrokeGlyph(UppercaseEthGlyph):
+    """Drawn exactly like the Icelandic eth `Ð`."""
+
+    name = "uppercase_dcroat"
+    unicode = "0x110"
+
+
+class LowercaseDStrokeGlyph(LowercaseDGlyph):
+    """d with a bar across its ascender, at the height of the one on ħ."""
+
+    name = "lowercase_dcroat"
+    unicode = "0x111"
+    # Bar reach past the stem, as fractions of the body width
+    bar_left = 0.45
+    bar_right = 0.15
+
+    def draw(self, pen, dc):
+        super().draw(pen, dc)
+        b = dc.body_bounds(width_ratio=self.width_ratio, offset=self.offset)
+        y = (dc.x_height + dc.ascent) / 2
+        draw_rect(
+            pen,
+            b.x2 - dc.stroke_x - self.bar_left * b.width,
+            y - dc.stroke_y / 2,
+            b.x2 + self.bar_right * b.width,
+            y + dc.stroke_y / 2,
+        )
 
 
 # ── Polish: ogonek ───────────────────────────────────────────────────
