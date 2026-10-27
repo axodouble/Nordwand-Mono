@@ -300,8 +300,7 @@ def render_sample(output, lexer, code, font_path, target_width, font_size=FONT_S
     print(f"Saved {output} ({canvas.width}x{canvas.height})")
 
 
-LES_DRUS_DESCRIPTION = (
-    """\
+LES_DRUS_DESCRIPTION = """\
     Les Drus constituent deux pics d'une montagne des Alpes de Haute-Savoie, situés dans le massif du Mont-Blanc:
 
         — le Grand Dru (3 754 m, point culminant) ;
@@ -319,7 +318,6 @@ LES_DRUS_DESCRIPTION = (
 
     Sept ans après Walter Bonatti, Gary Hemming et Royal Robbins, deux grimpeurs venus des États-Unis, inaugurent une très importante variante menant directement de la base de la face au bloc coincé, dans la moitié supérieure, où elle rejoint la voie de 1952. Ouverte du 24 au 26 juillet 1962, cette voie est baptisée la directe américaine et devint par la suite une grande classique. Ce n'est pas le cas de l'autre directe, toujours américaine, tracée en plein centre de la face par le même Royal Robbins, accompagné cette fois de John Harlin (10 au 13 août 1965). Extrêmement difficile, tant dans le domaine de l'escalade artificielle que de l'escalade libre, cette directissime américaine fut relativement peu répétée.
     """
-)
 
 
 def render_composition(output, font_path, target_width):
@@ -455,6 +453,71 @@ def render_weights_sample(output, font_path, target_width):
     print(f"Saved {output} ({img.width}x{img.height})")
 
 
+POWERLINE_GLYPHS = " ".join(
+    chr(c) for c in [*range(0xE0A0, 0xE0A4), *range(0xE0B0, 0xE0C0)]
+)
+
+# Status lines as runs of (text, fg, bg), with None as the image background.
+# A divider takes the colour of the segment it ends, over the next one.
+_SEGMENTS = [
+    (" tywr ", BG, PRIMARY),
+    (" ~/Nordwand-Mono ", FG, NOIR_7),
+    (" \ue0a0 dev ", NOIR_2, NOIR_8),
+]
+
+
+def _bar(divider, start=None):
+    runs = [(start, _SEGMENTS[0][2], None)] if start else []
+    for i, (text, fg, bg) in enumerate(_SEGMENTS):
+        next_bg = _SEGMENTS[i + 1][2] if i + 1 < len(_SEGMENTS) else None
+        runs += [(text, fg, bg), (divider, bg, next_bg)]
+    return runs
+
+
+POWERLINE_BARS = [
+    _bar("\ue0b0"),
+    _bar("\ue0b4", start="\ue0b6"),
+    _bar("\ue0bc"),
+    [
+        (" NORMAL ", BG, PRIMARY),
+        ("\ue0b0", PRIMARY, NOIR_7),
+        (" main.py \ue0a2 ", FG, NOIR_7),
+        ("\ue0b0", NOIR_7, None),
+        ("  utf-8 \ue0b3 ", NOIR_5, None),
+        ("\ue0b2", NOIR_8, None),
+        (" \ue0a1 42 \ue0a3 17 ", NOIR_2, NOIR_8),
+    ],
+]
+
+
+def render_powerline_sample(output, font_path, target_width):
+    font = ImageFont.truetype(font_path, FONT_SIZE)
+    char_w = font.getlength("M")
+    ascent, descent = font.getmetrics()
+    line_h = ascent + descent
+    row_gap = LINE_PAD * 3
+
+    rows = [[(POWERLINE_GLYPHS, FG, None)], *POWERLINE_BARS]
+    img_h = 2 * IMAGE_PAD + len(rows) * line_h + (len(rows) - 1) * row_gap
+    img = Image.new("RGB", (target_width, img_h), BG)
+    draw = ImageDraw.Draw(img)
+
+    y = IMAGE_PAD
+    for runs in rows:
+        x = IMAGE_PAD
+        for text, fg, bg in runs:
+            w = char_w * len(text)
+            if bg:
+                draw.rectangle([x, y, x + w - 1, y + line_h - 1], fill=bg)
+            draw.text((x, y), text, font=font, fill=fg)
+            x += w
+        y += line_h + row_gap
+
+    os.makedirs(os.path.dirname(output), exist_ok=True)
+    img.save(output)
+    print(f"Saved {output} ({img.width}x{img.height})")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate code-sample PNGs")
     parser.add_argument(
@@ -495,6 +558,12 @@ if __name__ == "__main__":
 
     render_weights_sample(
         os.path.join(args.output_dir, "sample_weights.png"),
+        args.font,
+        target_width,
+    )
+
+    render_powerline_sample(
+        os.path.join(args.output_dir, "sample_powerline.png"),
         args.font,
         target_width,
     )

@@ -117,6 +117,8 @@ Only the listed weights are built.
 
 The font covers Latin (including the accented letters of most European languages) and Cyrillic.
 
+It also includes the [Powerline](https://github.com/powerline/powerline) symbols (U+E0A0–U+E0A3) and segment dividers (U+E0B0–U+E0BF): arrows, rounded ends, corner triangles and diagonals. The dividers span the full line height and slightly overlap the adjacent cell, so status lines render without the Nerd Font variant.
+
 ## Weights
 
 ![Weights](assets/samples/sample_weights.png)
@@ -140,6 +142,10 @@ The font covers Latin (including the accented letters of most European languages
 ### Cyrillic
 
 ![Cyrillic sample](assets/samples/sample_cyrillic.jpg)
+
+### Powerline
+
+![Powerline sample](assets/samples/sample_powerline.png)
 
 ## License
 
