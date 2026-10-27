@@ -42,6 +42,8 @@ from glyphs.uppercase.z import UppercaseZGlyph
 from glyphs.uppercase.t import UppercaseTGlyph
 from glyphs.uppercase.k import UppercaseKGlyph
 from glyphs.uppercase.r import UppercaseRGlyph
+from glyphs.uppercase.h import UppercaseHGlyph
+from glyphs.lowercase.square.h import LowercaseHGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -948,6 +950,78 @@ class UppercaseZDotGlyph(ComposedGlyph):
     base_glyph_class = UppercaseZGlyph
     accent_class = DotAbove
     accent_y = _uc_accent
+
+
+# ── Maltese: dot above and H with stroke ─────────────────────────────
+
+
+class LowercaseCDotGlyph(ComposedGlyph):
+    name = "lowercase_cdotaccent"
+    unicode = "0x10B"
+    base_glyph_class = LowercaseCGlyph
+    accent_class = DotAbove
+    accent_y = _lc_accent
+
+
+class UppercaseCDotGlyph(ComposedGlyph):
+    name = "uppercase_cdotaccent"
+    unicode = "0x10A"
+    base_glyph_class = UppercaseCGlyph
+    accent_class = DotAbove
+    accent_y = _uc_accent
+
+
+class LowercaseGDotGlyph(ComposedGlyph):
+    name = "lowercase_gdotaccent"
+    unicode = "0x121"
+    base_glyph_class = LowercaseGGlyph
+    accent_class = DotAbove
+    accent_y = _lc_accent
+
+
+class UppercaseGDotGlyph(ComposedGlyph):
+    name = "uppercase_gdotaccent"
+    unicode = "0x120"
+    base_glyph_class = UppercaseGGlyph
+    accent_class = DotAbove
+    accent_y = _uc_accent
+
+
+class LowercaseHStrokeGlyph(LowercaseHGlyph):
+    name = "lowercase_hbar"
+    unicode = "0x127"
+    # Bar reach past the stem, as fractions of the body width
+    bar_left = 0.15
+    bar_right = 0.45
+
+    def draw(self, pen, dc):
+        super().draw(pen, dc)
+        b = dc.body_bounds(width_ratio=self.width_ratio, offset=self.offset)
+        y = (dc.x_height + dc.ascent) / 2
+        draw_rect(
+            pen,
+            b.x1 - self.bar_left * b.width,
+            y - dc.stroke_y / 2,
+            b.x1 + dc.stroke_x + self.bar_right * b.width,
+            y + dc.stroke_y / 2,
+        )
+
+
+class UppercaseHStrokeGlyph(UppercaseHGlyph):
+    name = "uppercase_hbar"
+    unicode = "0x126"
+    bar_y = 0.78  # Relative to the cap height
+    bar_overhang = 0.15  # Past each stem, relative to the body width
+
+    def draw(self, pen, dc):
+        super().draw(pen, dc)
+        b = dc.body_bounds(
+            offset=self.offset, height="cap", width_ratio=self.width_ratio, uppercase=True
+        )
+        sy = dc.stroke_y * self.stroke_y_ratio
+        y = self.bar_y * b.height
+        o = self.bar_overhang * b.width
+        draw_rect(pen, b.x1 - o, y - sy / 2, b.x2 + o, y + sy / 2)
 
 
 # ── Polish: ogonek ───────────────────────────────────────────────────
