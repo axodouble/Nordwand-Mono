@@ -17,6 +17,7 @@ from glyphs.lowercase.square.n import LowercaseNGlyph
 from glyphs.lowercase.dotted.i import LowercaseIGlyph
 from glyphs.lowercase.dotted.i_2 import LowercaseI2Glyph
 from glyphs.lowercase.y import LowercaseYGlyph
+from glyphs.lowercase.w import LowercaseWGlyph
 from glyphs.lowercase.s import LowercaseSGlyph
 from glyphs.lowercase.single_story.g import LowercaseGGlyph
 from glyphs.lowercase.l import LowercaseLGlyph
@@ -33,6 +34,7 @@ from glyphs.uppercase.u import UppercaseUGlyph
 from glyphs.uppercase.n import UppercaseNGlyph
 from glyphs.uppercase.c import UppercaseCGlyph
 from glyphs.uppercase.y import UppercaseYGlyph
+from glyphs.uppercase.w import UppercaseWGlyph
 from glyphs.uppercase.s import UppercaseSGlyph
 from glyphs.uppercase.g import UppercaseGGlyph
 from glyphs.uppercase.l import UppercaseLGlyph
@@ -619,6 +621,105 @@ class UppercaseYDieresisGlyph(ComposedGlyph):
     unicode = "0x178"
     base_glyph_class = UppercaseYGlyph
     accent_class = Dieresis
+    accent_y = _uc_accent
+
+
+# ── W and Y with circumflex, grave, acute, dieresis (Welsh) ──────────
+
+
+class LowercaseWCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_wcircumflex"
+    unicode = "0x175"
+    base_glyph_class = LowercaseWGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseWCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_wcircumflex"
+    unicode = "0x174"
+    base_glyph_class = UppercaseWGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseYCircumflexGlyph(ComposedGlyph):
+    name = "lowercase_ycircumflex"
+    unicode = "0x177"
+    base_glyph_class = LowercaseYGlyph
+    accent_class = Circumflex
+    accent_y = _lc_accent
+
+
+class UppercaseYCircumflexGlyph(ComposedGlyph):
+    name = "uppercase_ycircumflex"
+    unicode = "0x176"
+    base_glyph_class = UppercaseYGlyph
+    accent_class = Circumflex
+    accent_y = _uc_accent
+
+
+class LowercaseWGraveGlyph(ComposedGlyph):
+    name = "lowercase_wgrave"
+    unicode = "0x1E81"
+    base_glyph_class = LowercaseWGlyph
+    accent_class = Grave
+    accent_y = _lc_accent
+
+
+class UppercaseWGraveGlyph(ComposedGlyph):
+    name = "uppercase_wgrave"
+    unicode = "0x1E80"
+    base_glyph_class = UppercaseWGlyph
+    accent_class = Grave
+    accent_y = _uc_accent
+
+
+class LowercaseWAcuteGlyph(ComposedGlyph):
+    name = "lowercase_wacute"
+    unicode = "0x1E83"
+    base_glyph_class = LowercaseWGlyph
+    accent_class = Acute
+    accent_y = _lc_accent
+
+
+class UppercaseWAcuteGlyph(ComposedGlyph):
+    name = "uppercase_wacute"
+    unicode = "0x1E82"
+    base_glyph_class = UppercaseWGlyph
+    accent_class = Acute
+    accent_y = _uc_accent
+
+
+class LowercaseWDieresisGlyph(ComposedGlyph):
+    name = "lowercase_wdieresis"
+    unicode = "0x1E85"
+    base_glyph_class = LowercaseWGlyph
+    accent_class = Dieresis
+    accent_y = _lc_accent
+
+
+class UppercaseWDieresisGlyph(ComposedGlyph):
+    name = "uppercase_wdieresis"
+    unicode = "0x1E84"
+    base_glyph_class = UppercaseWGlyph
+    accent_class = Dieresis
+    accent_y = _uc_accent
+
+
+class LowercaseYGraveGlyph(ComposedGlyph):
+    name = "lowercase_ygrave"
+    unicode = "0x1EF3"
+    base_glyph_class = LowercaseYGlyph
+    accent_class = Grave
+    accent_y = _lc_accent
+
+
+class UppercaseYGraveGlyph(ComposedGlyph):
+    name = "uppercase_ygrave"
+    unicode = "0x1EF2"
+    base_glyph_class = UppercaseYGlyph
+    accent_class = Grave
     accent_y = _uc_accent
 
 
