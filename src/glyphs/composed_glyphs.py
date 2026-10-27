@@ -1870,3 +1870,86 @@ class UppercaseTStrokeGlyph(TStrokeComposedGlyph):
             min_margin=dc.min_margin_uppercase,
         )
         return b, dc.stroke_y * base.stroke_y_ratio
+
+
+# ── Breve and tilde (Latin Extended-A) ───────────────────────────────
+
+
+class LowercaseEBreveGlyph(ComposedGlyph):
+    name = "lowercase_ebreve"
+    unicode = "0x115"
+    base_glyph_class = LowercaseEGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+class UppercaseEBreveGlyph(ComposedGlyph):
+    name = "uppercase_ebreve"
+    unicode = "0x114"
+    base_glyph_class = UppercaseEGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
+
+
+class LowercaseIBreveGlyph(ComposedGlyph):
+    name = "lowercase_ibreve"
+    unicode = "0x12D"
+    base_glyph_class = LowercaseIGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+class UppercaseIBreveGlyph(ComposedGlyph):
+    name = "uppercase_ibreve"
+    unicode = "0x12C"
+    base_glyph_class = UppercaseIGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
+
+
+class LowercaseOBreveGlyph(ComposedGlyph):
+    name = "lowercase_obreve"
+    unicode = "0x14F"
+    base_glyph_class = LowercaseOGlyph
+    accent_class = Breve
+    accent_y = _lc_accent
+
+
+class UppercaseOBreveGlyph(ComposedGlyph):
+    name = "uppercase_obreve"
+    unicode = "0x14E"
+    base_glyph_class = UppercaseOGlyph
+    accent_class = Breve
+    accent_y = _uc_accent
+
+
+class LowercaseITildeGlyph(ComposedGlyph):
+    name = "lowercase_itilde"
+    unicode = "0x129"
+    base_glyph_class = LowercaseIGlyph
+    accent_class = Tilde
+    accent_y = _lc_accent
+
+
+class UppercaseITildeGlyph(ComposedGlyph):
+    name = "uppercase_itilde"
+    unicode = "0x128"
+    base_glyph_class = UppercaseIGlyph
+    accent_class = Tilde
+    accent_y = _uc_accent
+
+
+class LowercaseUTildeGlyph(ComposedGlyph):
+    name = "lowercase_utilde"
+    unicode = "0x169"
+    base_glyph_class = LowercaseUGlyph
+    accent_class = Tilde
+    accent_y = _lc_accent
+
+
+class UppercaseUTildeGlyph(ComposedGlyph):
+    name = "uppercase_utilde"
+    unicode = "0x168"
+    base_glyph_class = UppercaseUGlyph
+    accent_class = Tilde
+    accent_y = _uc_accent
