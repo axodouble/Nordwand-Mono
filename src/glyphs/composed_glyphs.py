@@ -44,6 +44,8 @@ from glyphs.uppercase.k import UppercaseKGlyph
 from glyphs.uppercase.r import UppercaseRGlyph
 from glyphs.uppercase.h import UppercaseHGlyph
 from glyphs.lowercase.square.h import LowercaseHGlyph
+from glyphs.uppercase.d import UppercaseDGlyph
+from glyphs.lowercase.single_story.d import LowercaseDGlyph
 
 from glyphs.accents.acute import Acute
 from glyphs.accents.grave import Grave
@@ -51,6 +53,7 @@ from glyphs.accents.circumflex import Circumflex
 from glyphs.accents.dieresis import Dieresis
 from glyphs.accents.tilde import Tilde
 from glyphs.accents.caron import Caron
+from glyphs.accents.caron_vertical import CaronVertical
 from glyphs.accents.ring import Ring
 from glyphs.accents.cedilla import Cedilla
 from glyphs.accents.macron import Macron
@@ -1016,12 +1019,159 @@ class UppercaseHStrokeGlyph(UppercaseHGlyph):
     def draw(self, pen, dc):
         super().draw(pen, dc)
         b = dc.body_bounds(
-            offset=self.offset, height="cap", width_ratio=self.width_ratio, uppercase=True
+            offset=self.offset,
+            height="cap",
+            width_ratio=self.width_ratio,
+            uppercase=True,
         )
         sy = dc.stroke_y * self.stroke_y_ratio
         y = self.bar_y * b.height
         o = self.bar_overhang * b.width
         draw_rect(pen, b.x1 - o, y - sy / 2, b.x2 + o, y + sy / 2)
+
+
+# ── Czech and Slovak: caron and ring ─────────────────────────────────
+
+
+class LowercaseCCaronGlyph(ComposedGlyph):
+    name = "lowercase_ccaron"
+    unicode = "0x10D"
+    base_glyph_class = LowercaseCGlyph
+    accent_class = Caron
+    accent_y = _lc_accent
+
+
+class UppercaseCCaronGlyph(ComposedGlyph):
+    name = "uppercase_ccaron"
+    unicode = "0x10C"
+    base_glyph_class = UppercaseCGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class UppercaseDCaronGlyph(ComposedGlyph):
+    name = "uppercase_dcaron"
+    unicode = "0x10E"
+    base_glyph_class = UppercaseDGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class LowercaseECaronGlyph(ComposedGlyph):
+    name = "lowercase_ecaron"
+    unicode = "0x11B"
+    base_glyph_class = LowercaseEGlyph
+    accent_class = Caron
+    accent_y = _lc_accent
+
+
+class UppercaseECaronGlyph(ComposedGlyph):
+    name = "uppercase_ecaron"
+    unicode = "0x11A"
+    base_glyph_class = UppercaseEGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class LowercaseNCaronGlyph(ComposedGlyph):
+    name = "lowercase_ncaron"
+    unicode = "0x148"
+    base_glyph_class = LowercaseNGlyph
+    accent_class = Caron
+    accent_y = _lc_accent
+
+
+class UppercaseNCaronGlyph(ComposedGlyph):
+    name = "uppercase_ncaron"
+    unicode = "0x147"
+    base_glyph_class = UppercaseNGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class LowercaseRCaronGlyph(ComposedGlyph):
+    name = "lowercase_rcaron"
+    unicode = "0x159"
+    base_glyph_class = LowercaseRGlyph
+    accent_class = Caron
+    accent_y = _lc_accent
+
+
+class UppercaseRCaronGlyph(ComposedGlyph):
+    name = "uppercase_rcaron"
+    unicode = "0x158"
+    base_glyph_class = UppercaseRGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class UppercaseTCaronGlyph(ComposedGlyph):
+    name = "uppercase_tcaron"
+    unicode = "0x164"
+    base_glyph_class = UppercaseTGlyph
+    accent_class = Caron
+    accent_y = _uc_accent
+
+
+class LowercaseURingGlyph(ComposedGlyph):
+    name = "lowercase_uring"
+    unicode = "0x16F"
+    base_glyph_class = LowercaseUGlyph
+    accent_class = Ring
+    accent_y = _lc_accent
+
+
+class UppercaseURingGlyph(ComposedGlyph):
+    name = "uppercase_uring"
+    unicode = "0x16E"
+    base_glyph_class = UppercaseUGlyph
+    accent_class = Ring
+    accent_y = _uc_accent
+
+
+class LowercaseDCaronGlyph(ComposedGlyph):
+    """d with the vertical caron beside its ascender.
+
+    The d is narrowed if needed and shifted left so that it and the mark
+    fit in the cell together, centered as a pair.
+    """
+
+    name = "lowercase_dcaron"
+    unicode = "0x10F"
+    base_glyph_class = LowercaseDGlyph
+    accent_class = CaronVertical
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        mark = self.accent_class()
+        margin = 0
+        room = dc.window_width - 2 * margin - mark.width(dc)
+        base.width_ratio = min(base.width_ratio, (room - dc.stroke_x) / dc.width)
+        d_width = dc.width * base.width_ratio + dc.stroke_x
+        x1 = (dc.window_width - d_width - mark.width(dc)) / 2
+        base.offset = x1 - (dc.window_width - d_width) / 2
+        base.draw(pen, dc)
+        mark.draw_at(pen, dc, x=x1 + d_width, y=dc.ascent)
+
+
+class LowercaseTCaronGlyph(ComposedGlyph):
+    """t with the vertical caron beside the top of its stem."""
+
+    name = "lowercase_tcaron"
+    unicode = "0x165"
+    base_glyph_class = LowercaseTGlyph
+    accent_class = CaronVertical
+
+    def draw(self, pen, dc):
+        base = self._resolve_base_class(dc)()
+        base.draw(pen, dc)
+        b = dc.body_bounds(
+            offset=base.offset, height="x_height", width_ratio=base.width_ratio
+        )
+        top = (1 + base.up_ratio) * dc.x_height
+        accent = self.accent_class()
+        accent.height = 0.3
+        accent.draw_at(pen, dc, x=(b.xmid + b.x2) / 2, y=top)
 
 
 # ── Polish: ogonek ───────────────────────────────────────────────────
