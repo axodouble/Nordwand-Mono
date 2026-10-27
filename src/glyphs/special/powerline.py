@@ -213,23 +213,40 @@ class BranchGlyph(PowerlineGlyph):
     unicode = "0xE0A0"
     italic_skew = True
     stroke_ratio = 1
-    width_ratio = 0.8
-    fork = 0.3  # Height where the branch leaves the stem, relative to the cap
+    width_ratio = 1
+    fork = 0.22  # Height where the branch leaves the stem, relative to the cap
+    gap = 0.6  # Cut in the stem above the branch, relative to the stroke
+    arrow_width = 0.45  # Relative to the body width
+    arrow_height = 0.3  # Relative to the cap
 
     def draw(self, pen, dc):
         b = dc.body_bounds(offset=self.offset, height="cap", width_ratio=self.width_ratio)
         sx = self.stroke_ratio * dc.stroke_x
         sy = self.stroke_ratio * dc.stroke_y
-        draw_rect(pen, b.x1, 0, b.x1 + sx, dc.cap)
+        y_join = self.fork * dc.cap + sy
+        draw_rect(pen, b.x1, 0, b.x1 + sx, y_join)
+        draw_rect(pen, b.x1, y_join + self.gap * dc.stroke_y, b.x1 + sx, dc.cap)
+
+        aw = self.arrow_width * b.width
+        ah = self.arrow_height * dc.cap
+        xc = b.x2 - aw / 2
+        y_arrow = dc.cap - ah
+        x_end = b.x1 + sx / 2
+        g = 0.6 * (xc - b.x1 - sx * 1.5)
         draw_square_corner(
             pen,
             sx,
             sy,
-            b.x2,
-            dc.cap,
-            b.x1 + sx / 2,
+            xc + sx / 2,
+            y_arrow + 1,
+            x_end,
             self.fork * dc.cap,
+            gx=g,
+            gy=g,
             orientation="bottom-left",
+        )
+        draw_polygon(
+            pen, [(xc - aw / 2, y_arrow), (xc + aw / 2, y_arrow), (xc, dc.cap)]
         )
 
 
